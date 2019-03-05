@@ -1,0 +1,54 @@
+name: pier
+version: "0.1.0"
+author: Benjamin Scholtz <bscholtz.bds@gmail.com>
+about: A simple Docker script management CLI
+args:
+    - config:
+        short: c
+        long: config
+        value_name: FILE
+        help: sets a custom config file (default "$HOME/.pier")
+        takes_value: true
+subcommands:
+    - add:
+        about: Add a script using alias
+        args:
+            - INPUT:
+                required: true
+                index: 1
+                help: the script to save
+            - alias:
+                short: a
+                long: alias
+                required: true
+                help: alias/name for script
+            - tags:
+                short: t
+                long: tags
+                help: tags for script
+    - remove:
+        about: Remove a script using alias
+        args:
+            - alias:
+                short: a
+                long: alias
+                required: true
+                help: alias/name for script
+    - run:
+        about: Run script
+        args:
+            - alias:
+                short: a
+                long: alias
+                help: alias/name for script
+    - list:
+        about: List all scripts with optional filters
+        args:
+            - alias:
+                short: a
+                long: alias
+                help: alias/name for script
+            - tags:
+                short: t
+                long: tags
+                help: tags for script
