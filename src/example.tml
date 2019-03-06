@@ -1,0 +1,13 @@
+[[scripts]]
+alias = "Docker command alias"
+command = 'docker run -it repo/image'
+description = "A description"
+reference = 'http://github.com'
+tags = ["tag1", "tag2", "tag3"]
+
+[[scripts]]
+alias = "Docker command alias 2"
+command = 'docker run -it repo/image'
+description = "A description"
+reference = 'http://github.com'
+tags = ["tag1", "tag2", "tag3"]
