@@ -6,3 +6,7 @@ edition = "2018"
 
 [dependencies]
 clap = {version = "~2.27.0", features = ["yaml"]}
+toml = "0.4"
+
+[dev-dependencies]
+serde_derive = "1.0"
