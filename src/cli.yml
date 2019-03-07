@@ -9,6 +9,10 @@ args:
         value_name: FILE
         help: sets a custom config file (default "$HOME/.pier")
         takes_value: true
+    - accept:
+        short: y
+        long: accept
+        help: answer yes to all questions
 subcommands:
     - add:
         about: Add a script using alias
