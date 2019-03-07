@@ -1,7 +1,9 @@
+use clap::load_yaml;
 use clap::App;
 
 use toml;
-use serde_derive::{Debug, Deserialize};
+#[cfg(test)]
+use serde::{Debug, Deserialize};
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
