@@ -7,14 +7,30 @@ use clap::App;
 
 use toml;
 use toml::Value;
-#[cfg(test)]
-use serde::{Debug, Deserialize};
+
+use serde::{Deserialize};
+
+#[derive(Deserialize, Debug)]
+struct Config {
+    scripts: Option<Vec<Script>>,
+}
+
+#[derive(Deserialize, Debug)]
+struct Script {
+    alias: Option<String>,
+    command: Option<String>,
+    description: Option<String>,
+    reference: Option<String>,
+    tags: Option<Vec<String>>,
+}
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
 
-    let config = load_config(&matches);
+    let config: Config = load_config(&matches);
+
+    println!("{:#?}", config);
 
     match matches.subcommand() {
         ("add", Some(sub_matches)) => {
@@ -34,7 +50,7 @@ fn main() {
     }
 }
 
-fn load_config(matches: &clap::ArgMatches) -> Value {
+fn load_config(matches: &clap::ArgMatches) -> Config {
     let mut config_string = String::new();
     let mut config_dir = String::new();
 
@@ -54,5 +70,6 @@ fn load_config(matches: &clap::ArgMatches) -> Value {
         },
     };
 
-    return config_string.parse::<Value>().unwrap();
+    //return config_string.parse::<Value>().unwrap();
+    return toml::from_str(&config_string).unwrap();
 }
