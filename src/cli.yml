@@ -26,10 +26,12 @@ subcommands:
                 long: alias
                 required: true
                 help: alias/name for script
+                takes_value: true
             - tags:
                 short: t
                 long: tags
                 help: tags for script
+                takes_value: true
     - remove:
         about: Remove a script using alias
         args:
@@ -38,6 +40,7 @@ subcommands:
                 long: alias
                 required: true
                 help: alias/name for script
+                takes_value: true
     - run:
         about: Run script
         args:
@@ -45,6 +48,7 @@ subcommands:
                 short: a
                 long: alias
                 help: alias/name for script
+                takes_value: true
     - list:
         about: List all scripts with optional filters
         args:
@@ -52,7 +56,9 @@ subcommands:
                 short: a
                 long: alias
                 help: alias/name for script
+                takes_value: true
             - tags:
                 short: t
                 long: tags
                 help: tags for script
+                takes_value: true
