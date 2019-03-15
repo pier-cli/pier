@@ -49,6 +49,11 @@ subcommands:
                 long: alias
                 help: alias/name for script
                 takes_value: true
+            - dir:
+                short: d
+                long: dir
+                help: run script in directory
+                takes_value: true
     - list:
         about: List all scripts with optional filters
         args:

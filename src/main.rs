@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{prelude::*, Error};
 use std::env;
 use std::process;
+use std::process::Command;
 use std::collections::HashMap;
 
 use clap::load_yaml;
@@ -70,7 +71,30 @@ fn main() {
             println!("remove subcommand was used");
         },
         ("run", Some(sub_matches)) => {
-            println!("run subcommand was used");
+            let alias = sub_matches.value_of("alias").unwrap();
+            println!("Starting script {}", alias);
+            println!("-------------------------");
+
+            match &config.scripts {
+                Some(_scripts) => {
+                    match config.scripts.as_mut().unwrap().get(&alias.to_string()) {
+                        Some(script) => {
+                            let mut command = Command::new("sh");
+                            let output = command.arg("-c").arg(&script.command)
+                                .output().expect("Failed to execute process");
+                            println!("{:?}", String::from_utf8_lossy(&output.stdout));
+                            
+                            assert!(output.status.success());
+                            println!("-------------------------");
+                            println!("Script complete");
+                        },
+                        None => {
+                            println!("Invalid alias, would you like to create a new script?");
+                        }
+                    }
+                },
+                None => {}
+            }
         },
         ("list", Some(sub_matches)) => {
             println!("list subcommand was used");
