@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{prelude::*, Error};
 use std::env;
 use std::process;
+use std::collections::HashMap;
 
 use clap::load_yaml;
 use clap::App;
@@ -13,7 +14,7 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Config {
-    scripts: Option<Vec<Script>>,
+    scripts: Option<HashMap<String, Script>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -45,17 +46,21 @@ fn main() {
             };
 
             match &config.scripts {
-                Some(scripts) => {
-                    config.scripts.as_mut().unwrap().push(appendage);
-                    write_config(&matches, &config);
+                Some(_scripts) => {
+                    config.scripts.as_mut().unwrap()
+                        .entry(alias.to_string()).or_insert(appendage);
+                    write_config(&matches, &config)
+                        .expect("Failed to save config to file");
                 },
                 None => {
+                    let mut scripts = HashMap::new();
+                    scripts.insert(alias.to_string(), appendage);
                     write_config(
                         &matches, 
                         &Config {
-                            scripts: Some(vec!(appendage))
-                        }
-                    );
+                            scripts: Some(scripts)
+                        })
+                        .expect("Failed to save config to file");
                 }
             }
 
@@ -81,7 +86,8 @@ fn write_config(matches: &clap::ArgMatches, config: &Config) -> Result<(),Error>
     let mut file = File::create(&config_dir)?;
     
     let toml = toml::to_string(config).unwrap();
-    file.write_all(toml.as_bytes()).expect("Could not write to file!");
+    file.write_all(toml.as_bytes())
+        .expect("Could not write to file!");
     
     Ok(())
 }
@@ -92,7 +98,8 @@ fn load_config(matches: &clap::ArgMatches) -> Config {
     
     match File::open(&config_dir) {
         Ok(mut file) => {
-            file.read_to_string(&mut config_string);
+            file.read_to_string(&mut config_string)
+                .expect("Failed to read config file contents");
         },
         Err(_error) => {
             println!("Config file {} not found", &config_dir);
@@ -104,12 +111,18 @@ fn load_config(matches: &clap::ArgMatches) -> Config {
 }
 
 fn get_config_dir(matches: &clap::ArgMatches) -> String {
-    let mut config_dir = String::new();
+    let mut config_dir;
 
     if matches.is_present("config") {
-        config_dir = format!("{}", matches.value_of("config").unwrap());
+        config_dir = format!(
+            "{}",
+            matches.value_of("config").unwrap()
+        );
     } else {
-        config_dir = format!("{}/.pier", env::var("HOME").unwrap());
+        config_dir = format!(
+            "{}/.pier", 
+            env::var("HOME").expect("$HOME variable not set")
+        );
     }
 
     return config_dir;
