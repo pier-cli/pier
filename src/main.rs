@@ -97,18 +97,13 @@ fn main() {
             }
         },
         ("list", Some(sub_matches)) => {
-            println!("Listing all scripts");
-            println!("-------------------------");
-
             match &config.scripts {
                 Some(scripts) => {
                     for (alias, script) in scripts {
                         println!("{}: \"{:?}\"", alias, script);
                     }
                 },
-                None => {
-                    println!("No scripts exist, would you like to add a new script?");
-                }
+                None => println!("No scripts exist. Would you like to add a new script?")
             }
         },
         ("", None) => println!("No subcommand was used"),
