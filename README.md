@@ -16,7 +16,6 @@ See `src/cli.yml` for a more detailed spec.
 
 ```
 pier 0.1.0
-A simple Docker script management CLI
 
 USAGE:
     pier [FLAGS] [OPTIONS] [SUBCOMMAND]
