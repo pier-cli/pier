@@ -35,12 +35,10 @@ subcommands:
     - remove:
         about: Remove a script using alias
         args:
-            - alias:
-                short: a
-                long: alias
+            - INPUT:
                 required: true
+                index: 1
                 help: alias/name for script
-                takes_value: true
     - run:
         about: Run script
         args:

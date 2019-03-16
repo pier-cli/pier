@@ -35,12 +35,12 @@ fn main() {
 
     match matches.subcommand() {
         ("add", Some(sub_matches)) => {
-            let script = sub_matches.value_of("INPUT").unwrap();
+            let command = sub_matches.value_of("INPUT").unwrap();
             let alias = sub_matches.value_of("alias").unwrap();
            
             let appendage = Script {
                 alias: alias.to_string(),
-                command: script.to_string(), 
+                command: command.to_string(), 
                 description: None,
                 reference: None,
                 tags: None
@@ -65,10 +65,32 @@ fn main() {
                 }
             }
 
-            println!("+ {} / alias {}", script, alias);
+            println!("+ {} / alias {}", command, alias);
         },
         ("remove", Some(sub_matches)) => {
-            println!("remove subcommand was used");
+            let alias = sub_matches.value_of("INPUT").unwrap();
+            let script: Script;
+
+            match &config.scripts {
+                Some(scripts) => {
+                    if scripts.contains_key(&alias.to_string()) {
+                        script = config.scripts.as_mut().unwrap()
+                            .remove(&alias.to_string())
+                            .expect("Failed to remove script");
+                        write_config(&matches, &config)
+                            .expect("Failed to save config to file");
+                    } else {
+                        println!("Invalid alias");
+                        process::exit(1);
+                    } 
+                },
+                None => {
+                    println!("Invalid alias");
+                    process::exit(1);
+                }
+            }
+
+            println!("- {:?} / alias {}", script, alias);
         },
         ("run", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();
