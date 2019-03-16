@@ -71,7 +71,7 @@ fn main() {
             println!("remove subcommand was used");
         },
         ("run", Some(sub_matches)) => {
-            let alias = sub_matches.value_of("alias").unwrap();
+            let alias = sub_matches.value_of("INPUT").unwrap();
             println!("Starting script {}", alias);
             println!("-------------------------");
 

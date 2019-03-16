@@ -44,11 +44,10 @@ subcommands:
     - run:
         about: Run script
         args:
-            - alias:
-                short: a
-                long: alias
+            - INPUT:
+                required: true
+                index: 1
                 help: alias/name for script
-                takes_value: true
             - dir:
                 short: d
                 long: dir
