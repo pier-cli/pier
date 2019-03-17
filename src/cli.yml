@@ -32,6 +32,7 @@ subcommands:
                 long: tags
                 help: tags for script
                 takes_value: true
+                multiple: true
     - remove:
         about: Remove a script using alias
         args:
@@ -46,6 +47,12 @@ subcommands:
                 required: true
                 index: 1
                 help: alias/name for script
+            - args:
+                short: a
+                long: args
+                help: pass arguments to script
+                takes_value: true
+                multiple: true
             - dir:
                 short: d
                 long: dir
@@ -64,3 +71,4 @@ subcommands:
                 long: tags
                 help: tags for script
                 takes_value: true
+                multiple: true

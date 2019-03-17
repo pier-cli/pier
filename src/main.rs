@@ -94,15 +94,25 @@ fn main() {
         },
         ("run", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();
+            let mut args: Vec<_> = match &sub_matches.values_of("args") {
+                Some(ref unwrapped) => unwrapped.clone().map(String::from).collect::<Vec<_>>(),
+                None => vec![]
+            };
+
             println!("Starting script {}", alias);
             println!("-------------------------");
 
             match &config.scripts {
                 Some(_scripts) => {
-                    match config.scripts.as_mut().unwrap().get(&alias.to_string()) {
+                    match &config.scripts.as_mut().unwrap().get(&alias.to_string()) {
                         Some(script) => {
                             let mut command = Command::new("sh");
-                            let output = command.arg("-c").arg(&script.command)
+                            let mut script_with_args = vec![String::from(r#"-c"#), String::from(r#"'"#), script.command.clone()];
+                            script_with_args.append(&mut args);
+                            script_with_args.append(&mut vec![String::from(r#"'"#)]);
+                            println!("{:?}", script_with_args);
+                            let output = command
+                                .args(script_with_args)
                                 .output().expect("Failed to execute process");
                             println!("{:?}", String::from_utf8_lossy(&output.stdout));
                             
@@ -110,9 +120,7 @@ fn main() {
                             println!("-------------------------");
                             println!("Script complete");
                         },
-                        None => {
-                            println!("Invalid alias, would you like to create a new script?");
-                        }
+                        None => println!("Invalid alias, would you like to create a new script?")
                     }
                 },
                 None => {}
