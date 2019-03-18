@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use clap::load_yaml;
 use clap::App;
 
+#[macro_use] extern crate shell;
+
 use toml;
 use toml::Value;
 
@@ -94,25 +96,25 @@ fn main() {
         },
         ("run", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();
-            println!("Starting script {}", alias);
+            let arg = match &sub_matches.value_of("arg") {
+                Some(ref arg) => String::from(arg.clone()),
+                None => String::from("")
+            };
+
+            println!("Starting script \"{}\"", alias);
             println!("-------------------------");
 
             match &config.scripts {
                 Some(_scripts) => {
-                    match config.scripts.as_mut().unwrap().get(&alias.to_string()) {
+                    match &config.scripts.as_mut().unwrap().get(&alias.to_string()) {
                         Some(script) => {
-                            let mut command = Command::new("sh");
-                            let output = command.arg("-c").arg(&script.command)
-                                .output().expect("Failed to execute process");
-                            println!("{:?}", String::from_utf8_lossy(&output.stdout));
-                            
-                            assert!(output.status.success());
+                            let output = cmd!(&format!("{} {}", &script.command, &arg)).stdout_utf8().unwrap();
+                            println!("{}", output);
+
                             println!("-------------------------");
                             println!("Script complete");
                         },
-                        None => {
-                            println!("Invalid alias, would you like to create a new script?");
-                        }
+                        None => println!("Invalid alias, would you like to create a new script?")
                     }
                 },
                 None => {}
