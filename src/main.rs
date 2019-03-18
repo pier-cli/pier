@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io::{prelude::*, Error};
 use std::env;
 use std::process;
-use std::process::Command;
 use std::collections::HashMap;
 
 use clap::load_yaml;
@@ -11,8 +10,6 @@ use clap::App;
 #[macro_use] extern crate shell;
 
 use toml;
-use toml::Value;
-
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -96,8 +93,8 @@ fn main() {
         },
         ("run", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();
-            let arg = match &sub_matches.value_of("arg") {
-                Some(ref arg) => String::from(arg.clone()),
+            let arg = match sub_matches.value_of("arg") {
+                Some(arg) => String::from(arg),
                 None => String::from("")
             };
 
@@ -120,7 +117,7 @@ fn main() {
                 None => {}
             }
         },
-        ("list", Some(sub_matches)) => {
+        ("list", Some(_sub_matches)) => {
             match &config.scripts {
                 Some(scripts) => {
                     for (alias, script) in scripts {
@@ -162,23 +159,16 @@ fn load_config(matches: &clap::ArgMatches) -> Config {
         },
     };
 
-    return toml::from_str(&config_string).unwrap();
+    toml::from_str(&config_string).unwrap()
 }
 
 fn get_config_dir(matches: &clap::ArgMatches) -> String {
-    let mut config_dir;
-
     if matches.is_present("config") {
-        config_dir = format!(
-            "{}",
-            matches.value_of("config").unwrap()
-        );
+        matches.value_of("config").unwrap().to_string()
     } else {
-        config_dir = format!(
+        format!(
             "{}/.pier", 
             env::var("HOME").expect("$HOME variable not set")
-        );
+        )
     }
-
-    return config_dir;
 }
