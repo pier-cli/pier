@@ -47,12 +47,11 @@ subcommands:
                 required: true
                 index: 1
                 help: alias/name for script
-            - args:
+            - arg:
                 short: a
-                long: args
-                help: pass arguments to script
+                long: arg
+                help: pass argument to script
                 takes_value: true
-                multiple: true
             - dir:
                 short: d
                 long: dir

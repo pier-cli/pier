@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use clap::load_yaml;
 use clap::App;
 
+#[macro_use] extern crate shell;
+
 use toml;
 use toml::Value;
 
@@ -94,29 +96,21 @@ fn main() {
         },
         ("run", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();
-            let mut args: Vec<_> = match &sub_matches.values_of("args") {
-                Some(ref unwrapped) => unwrapped.clone().map(String::from).collect::<Vec<_>>(),
-                None => vec![]
+            let arg = match &sub_matches.value_of("arg") {
+                Some(ref arg) => String::from(arg.clone()),
+                None => String::from("")
             };
 
-            println!("Starting script {}", alias);
+            println!("Starting script \"{}\"", alias);
             println!("-------------------------");
 
             match &config.scripts {
                 Some(_scripts) => {
                     match &config.scripts.as_mut().unwrap().get(&alias.to_string()) {
                         Some(script) => {
-                            let mut command = Command::new("sh");
-                            let mut script_with_args = vec![String::from(r#"-c"#), String::from(r#"'"#), script.command.clone()];
-                            script_with_args.append(&mut args);
-                            script_with_args.append(&mut vec![String::from(r#"'"#)]);
-                            println!("{:?}", script_with_args);
-                            let output = command
-                                .args(script_with_args)
-                                .output().expect("Failed to execute process");
-                            println!("{:?}", String::from_utf8_lossy(&output.stdout));
-                            
-                            assert!(output.status.success());
+                            let output = cmd!(&format!("{} {}", &script.command, &arg)).stdout_utf8().unwrap();
+                            println!("{}", output);
+
                             println!("-------------------------");
                             println!("Script complete");
                         },
