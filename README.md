@@ -60,6 +60,36 @@ description = "A script to clear out old Docker containers and images"
 tags = [ "docker", "flush" ]
 ```
 
+## Example `pier list` output
+
+```
+▶ pier list           
+ Alias             | Command 
+-------------------+----------------------------------------------------------------------------------------------------------------
+ fromscratch       | appimage-run ~/AppImage/FromScratch.1.4.3.AppImage 
+ nspawn-bionic     | sudo systemd-nspawn --bind=/tmp/.X11-unix -D /var/lib/machines/bionic --bind /home/bscholtz:/home/bscholtz 
+ bspwm-refresh     | .config/bspwm/bspwmrc 
+ flush-docker      | docker container stop $(docker container ls -a -q) && docker system prune -a -f --volumes 
+ zfs-compression   | sudo zfs get all | grep compressratio 
+ mongo-docker      | docker run --name mongodb -d mongo:latest 
+ forward-mongo     | kubectl port-forward mongo-molecule-set-0 27018:27017 
+ refresh-wifi      | ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up 
+ lepton            | appimage-run ~/AppImage/Lepton-1.8.0-x86_64.AppImage 
+ ledger            | appimage-run AppImage/ledger-live-desktop-1.6.0-linux-x86_64.AppImage 
+ reload-urxvt      | xrdb ~/.Xresources 
+ kill-docker       | rm -rf /var/lib/docker 
+ reload-xresources | xrdb ~/.Xresources 
+ graphiql          | appimage-run ~/AppImage/graphiql-app-0.7.2-x86_64.AppImage 
+ enabled-services  | systemctl list-unit-files --state=enabled 
+ ports             | netstat -tulpn 
+ chmod-copy        | chmod --reference= 
+ zfs-drop-caches   | sync; echo 2 | sudo tee /proc/sys/vm/drop_caches 
+ update            | sudo nix-channel --update && sudo nixos-rebuild switch 
+ flush-untagged    | docker images -q --filter dangling=true | xargs -r docker rmi 
+ twa-analyze       | docker run --rm -t trailofbits/twa -vw 
+ parity-ubuntu     | docker image pull yodascholtz/parity-ubuntu:latest && docker run -p 8545:8545 yodascholtz/parity-ubuntu:latest
+```
+
 ## Origin
 
 Originally intended as a way to manage Docker one-liners, the name `pier` continues along the same maritime theme. I realized Pier can manage a lot more than just Docker scripts.
