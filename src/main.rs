@@ -35,6 +35,24 @@ fn main() {
 
     let config = &mut load_config(&matches);
 
+    match matches.value_of("INPUT") {
+        Some(alias) => {
+            // let arg = match sub_matches.value_of("arg") {
+            //     Some(arg) => String::from(arg),
+            //     None => String::from("")
+            // };
+            let arg = String::from("");
+
+            match fetch_script(alias, config) {
+                Some(script) => run_command(alias, &script.command, &arg),
+                None => println!("Invalid alias, would you like to create a new script?"),
+            }
+        },
+        None => handle_subcommands(&matches, config).expect("No input or subcommands"),
+    }    
+}
+
+fn handle_subcommands(matches: &clap::ArgMatches, config: & mut Config) -> Result<(),Error> {
     match matches.subcommand() {
         ("add", Some(sub_matches)) => {
             let command = sub_matches.value_of("INPUT").unwrap();
@@ -101,23 +119,9 @@ fn main() {
                 None => String::from("")
             };
 
-            println!("Starting script \"{}\"", alias);
-            println!("-------------------------");
-
-            match &config.scripts {
-                Some(_scripts) => {
-                    match &config.scripts.as_mut().unwrap().get(&alias.to_string()) {
-                        Some(script) => {
-                            let output = cmd!(&format!("{} {}", &script.command, &arg)).stdout_utf8().unwrap();
-                            println!("{}", output);
-
-                            println!("-------------------------");
-                            println!("Script complete");
-                        },
-                        None => println!("Invalid alias, would you like to create a new script?")
-                    }
-                },
-                None => {}
+            match fetch_script(alias, config) {
+                Some(script) => run_command(alias, &script.command, &arg),
+                None => println!("Invalid alias, would you like to create a new script?"),
             }
         },
         ("list", Some(_sub_matches)) => {
@@ -138,6 +142,28 @@ fn main() {
         ("", None) => println!("No subcommand was used"),
         _          => unreachable!(),
     }
+
+    Ok(())
+}
+
+fn fetch_script<'a>(alias: &str, config: &'a Config) -> Option<&'a Script> {
+    return match &config.scripts {
+        Some(scripts) => {
+            scripts.get(&alias.to_string())
+        },
+        None => None
+    }
+}
+
+fn run_command(alias: &str, command: &str, arg: &str) {
+    println!("Starting script \"{}\"", alias);
+    println!("-------------------------");
+
+    let output = cmd!(&format!("{} {}", command, arg)).stdout_utf8().unwrap();
+    println!("{}", output);
+
+    println!("-------------------------");
+    println!("Script complete");
 }
 
 fn write_config(matches: &clap::ArgMatches, config: &Config) -> Result<(),Error> {
