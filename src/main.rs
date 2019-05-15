@@ -7,6 +7,9 @@ use std::collections::HashMap;
 use clap::load_yaml;
 use clap::App;
 
+#[macro_use] extern crate prettytable;
+use prettytable::{Table, Row, Cell, format};
+
 #[macro_use] extern crate shell;
 
 use toml;
@@ -120,9 +123,14 @@ fn main() {
         ("list", Some(_sub_matches)) => {
             match &config.scripts {
                 Some(scripts) => {
+                    let mut table = Table::new();
+                    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+                    table.set_titles(row!["Alias", "Command"]);
                     for (alias, script) in scripts {
-                        println!("{}: \"{:?}\"", alias, script);
+                        table.add_row(row![alias, script.command]);
                     }
+                    // Print the table to stdout
+                    table.printstd();
                 },
                 None => println!("No scripts exist. Would you like to add a new script?")
             }
