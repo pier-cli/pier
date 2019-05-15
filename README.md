@@ -3,6 +3,8 @@
 
 A central repository to manage all your one-liners, scripts, tools, and CLIs. Add, remove, list, and run scripts - storing metadata to easily find them later. No more digging through your `bin` folder...
 
+![Boat pier](https://raw.githubusercontent.com/BenSchZA/pier/master/.media/boat-dock.png)
+
 ## Description
 
 If you've spent any amount of time in the terminal you no doubt have built up a lovely collection of one-liners, scripts, useful tools, and CLIs. Whenever you want to use them you dig through your `bin` folder trying to remember what you called the script... Linux users love hard-to-remember naming conventions.
