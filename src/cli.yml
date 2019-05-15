@@ -1,8 +1,12 @@
 name: pier
-version: "0.1.0"
+version: "0.2.0"
 author: Benjamin Scholtz <bscholtz.bds@gmail.com>
 about: A simple Docker script management CLI
 args:
+    - INPUT:
+        help: alias/name for script to run
+        required: false
+        index: 1
     - config:
         short: c
         long: config
@@ -26,6 +30,16 @@ subcommands:
                 long: alias
                 required: true
                 help: alias/name for script
+                takes_value: true
+            - description:
+                short: d
+                long: description
+                help: description for script
+                takes_value: true
+            - reference:
+                short: r
+                long: reference
+                help: reference for script
                 takes_value: true
             - tags:
                 short: t
