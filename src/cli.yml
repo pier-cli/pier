@@ -13,10 +13,10 @@ args:
         value_name: FILE
         help: sets a custom config file (default "$HOME/.pier")
         takes_value: true
-    - accept:
-        short: y
-        long: accept
-        help: answer yes to all questions
+    # - accept:
+    #     short: y
+    #     long: accept
+    #     help: answer yes to all questions
 subcommands:
     - add:
         about: Add a script using alias
@@ -31,22 +31,22 @@ subcommands:
                 required: true
                 help: alias/name for script
                 takes_value: true
-            - description:
-                short: d
-                long: description
-                help: description for script
-                takes_value: true
-            - reference:
-                short: r
-                long: reference
-                help: reference for script
-                takes_value: true
-            - tags:
-                short: t
-                long: tags
-                help: tags for script
-                takes_value: true
-                multiple: true
+            # - description:
+            #     short: d
+            #     long: description
+            #     help: description for script
+            #     takes_value: true
+            # - reference:
+            #     short: r
+            #     long: reference
+            #     help: reference for script
+            #     takes_value: true
+            # - tags:
+            #     short: t
+            #     long: tags
+            #     help: tags for script
+            #     takes_value: true
+            #     multiple: true
     - remove:
         about: Remove a script using alias
         args:
@@ -66,11 +66,11 @@ subcommands:
                 long: arg
                 help: pass argument to script
                 takes_value: true
-            - dir:
-                short: d
-                long: dir
-                help: run script in directory
-                takes_value: true
+            # - dir:
+            #     short: d
+            #     long: dir
+            #     help: run script in directory
+            #     takes_value: true
     - list:
         about: List all scripts with optional filters
         args:
@@ -79,9 +79,9 @@ subcommands:
                 long: alias
                 help: alias/name for script
                 takes_value: true
-            - tags:
-                short: t
-                long: tags
-                help: tags for script
-                takes_value: true
-                multiple: true
+            # - tags:
+            #     short: t
+            #     long: tags
+            #     help: tags for script
+            #     takes_value: true
+            #     multiple: true
