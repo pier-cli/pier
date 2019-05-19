@@ -8,7 +8,7 @@ use clap::load_yaml;
 use clap::App;
 
 #[macro_use] extern crate prettytable;
-use prettytable::{Table, Row, Cell, format};
+use prettytable::{Table, format};
 
 #[macro_use] extern crate shell;
 
@@ -206,3 +206,6 @@ fn get_config_dir(matches: &clap::ArgMatches) -> String {
         )
     }
 }
+
+#[cfg(test)]
+mod test;
