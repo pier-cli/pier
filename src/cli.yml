@@ -1,5 +1,5 @@
 name: pier
-version: "0.2.0"
+version: "0.2.1"
 author: Benjamin Scholtz <bscholtz.bds@gmail.com>
 about: A simple Docker script management CLI
 args:
@@ -11,7 +11,14 @@ args:
         short: c
         long: config
         value_name: FILE
-        help: sets a custom config file (default "$HOME/.pier")
+        long_help: |
+            Sets a custom config file.
+
+            DEFAULT PATH is otherwise determined in this order:
+            1. "$PIER_CONFIG_PATH"
+            2. "$XDG_CONFIG_HOME/pier/config"
+            3. "$HOME/.config/pier/config"
+            4. "$HOME/.pier")
         takes_value: true
     # - accept:
     #     short: y
