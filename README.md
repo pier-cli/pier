@@ -42,6 +42,8 @@ SUBCOMMANDS:
     run       Run script
 ```
 
+`pier list`, `pier add "ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up" --alias refresh-wifi`, `pier refresh-wifi`
+
 ## Example `pier` TOML config
 
 ```
