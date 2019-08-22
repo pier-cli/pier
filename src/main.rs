@@ -3,6 +3,7 @@ use std::io::{prelude::*, Error};
 use std::env;
 use std::process;
 use std::collections::HashMap;
+use std::path::Path;
 
 use clap::load_yaml;
 use clap::App;
@@ -199,10 +200,28 @@ fn load_config(matches: &clap::ArgMatches) -> Config {
 fn get_config_dir(matches: &clap::ArgMatches) -> String {
     if matches.is_present("config") {
         matches.value_of("config").unwrap().to_string()
+    } else if let Ok(pier_config_path_env) = env::var("PIER_CONFIG_PATH") {
+        // Adds possibility of user defined config path.
+        pier_config_path_env
     } else {
-        format!(
-            "{}/.pier", 
-            env::var("HOME").expect("$HOME variable not set")
-        )
+        let home_dir = env::var("HOME").expect("$HOME variable not set");
+
+        let xdg_config_home_path = match env::var("XDG_CONFIG_HOME") {
+            Ok(config_dir) => format!("{}/pier/config", config_dir),
+            Err(_) => format!("{}/.config/pier/config", home_dir)
+        };
+
+        let alternate_config_path = format!("{}/.pier", home_dir);
+
+        if Path::new(&xdg_config_home_path).exists() {
+            // Try using the XDG Base Directory standard if config path exists.
+            xdg_config_home_path
+        } else if Path::new(&alternate_config_path).exists() {
+            // Use the ~/.pier as a second choice of config path if it exists.
+            alternate_config_path
+        } else {
+            // If no valid config file can be found use xdg_config_home_path as a last resort even if it doesn't exist 
+            xdg_config_home_path
+        }
     }
 }

@@ -18,7 +18,8 @@ The idea behind `pier` is to create a central repository for all your scripts, a
 See `src/cli.yml` for a more detailed spec.
 
 ```
-pier 0.2.0
+pier 0.2.1
+Benjamin Scholtz <bscholtz.bds@gmail.com>
 A simple Docker script management CLI
 
 USAGE:
@@ -29,7 +30,13 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -c, --config <FILE>    sets a custom config file (default "$HOME/.pier")
+    -c, --config <FILE>    Sets a custom config file.
+                           
+                           DEFAULT PATH is otherwise determined in this order:
+                           1. "$PIER_CONFIG_PATH"
+                           2. "$XDG_CONFIG_HOME/pier/config"
+                           3. "$HOME/.config/pier/config"
+                           4. "$HOME/.pier")
 
 ARGS:
     <INPUT>    alias/name for script to run
