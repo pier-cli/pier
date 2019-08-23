@@ -159,8 +159,9 @@ fn fetch_script<'a>(alias: &str, config: &'a Config) -> Option<&'a Script> {
 fn run_command(alias: &str, command: &str, arg: &str) {
     println!("Starting script \"{}\"", alias);
     println!("-------------------------");
-
-    let output = cmd!(&format!("{} {}", command, arg)).stdout_utf8().unwrap();
+    
+    let default_shell = env::var("SHELL").expect("No default shell set!");
+    let output = cmd!(&format!("{} -c \"{} {}\"", default_shell, command, arg)).stdout_utf8().unwrap();
     println!("{}", output);
 
     println!("-------------------------");
