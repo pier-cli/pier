@@ -19,7 +19,6 @@ See `src/cli.yml` for a more detailed spec.
 
 ```
 pier 0.2.1
-Benjamin Scholtz <bscholtz.bds@gmail.com>
 A simple Docker script management CLI
 
 USAGE:
