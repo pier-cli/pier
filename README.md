@@ -35,7 +35,7 @@ OPTIONS:
                            1. "$PIER_CONFIG_PATH"
                            2. "$XDG_CONFIG_HOME/pier/config"
                            3. "$HOME/.config/pier/config"
-                           4. "$HOME/.pier")
+                           4. "$HOME/.pier"
 
 ARGS:
     <INPUT>    alias/name for script to run
