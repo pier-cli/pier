@@ -10,6 +10,7 @@ toml = "0.4"
 serde = { version = '1.0.83', features = ['derive'] }
 shell = { git = "https://github.com/google/rust-shell" }
 prettytable-rs = "^0.8"
+syntect = "3.2"
 
 [dev-dependencies]
 serde = { version = '1.0.83', features = ['derive'] }
