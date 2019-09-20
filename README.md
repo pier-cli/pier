@@ -1,6 +1,9 @@
 # **pier** ~ A Linux script management tool
 [![Build Status](https://travis-ci.com/BenSchZA/pier.svg?branch=master)](https://travis-ci.com/BenSchZA/pier)
 
+**NEW:** Nix derivation
+**COMING SOON:** Syntax highlighting
+
 A central repository to manage all your one-liners, scripts, tools, and CLIs. Add, remove, list, and run scripts - storing metadata to easily find them later. No more digging through your `bin` folder...
 
 ![Boat pier](https://raw.githubusercontent.com/BenSchZA/pier/master/.media/boat-dock.png)
@@ -12,6 +15,14 @@ If you've spent any amount of time in the terminal you no doubt have built up a 
 Scripts should be first-class citizens. In a GUI world we can find our programs using a menu of sorts. In the terminal scripts get lost.
 
 The idea behind `pier` is to create a central repository for all your scripts, and provide a way to attach metadata about these scripts. Using `pier` you can add, remove, list, and run scripts. These can be managed by `pier` in a human-readable TOML config, or you can use it to catalog existing scripts that you may have lying around - you'd then simply add the metadata for the specific script, and attach it to the name in the `PATH`.
+
+## Installation
+
+From GitHub release: simply download the release binary
+
+Using Nix package manager:
+1. From GitHub release: `make install` or `nix-env -if derivation.nix`
+2. From source: update `src` in derivation to `./.`
 
 ## Operation
 
