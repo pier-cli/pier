@@ -173,7 +173,10 @@ fn write_config(matches: &clap::ArgMatches, config: &Config) -> Result<(),Error>
     
     let mut file = File::create(&config_dir)?;
     
-    let toml = toml::to_string(config).unwrap();
+    // Using to_string_pretty forces the use of string literals.
+    let toml = toml::to_string_pretty(config).unwrap();
+
+
     file.write_all(toml.as_bytes())
         .expect("Could not write to file!");
     
