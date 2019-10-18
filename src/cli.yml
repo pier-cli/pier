@@ -2,10 +2,12 @@ name: pier
 version: "0.2.1"
 author: Benjamin Scholtz <bscholtz.bds@gmail.com>
 about: A simple Docker script management CLI
+settings:
+  - SubcommandsNegateReqs
 args:
     - INPUT:
         help: alias/name for script to run
-        required: false
+        required: true
         index: 1
     - config:
         short: c
