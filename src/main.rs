@@ -4,14 +4,13 @@ use std::env;
 use std::process;
 use std::collections::HashMap;
 use std::path::Path;
+use std::process::Command;
 
 use clap::load_yaml;
 use clap::App;
 
 #[macro_use] extern crate prettytable;
 use prettytable::{Table, Row, Cell, format};
-
-#[macro_use] extern crate shell;
 
 use toml;
 use serde::{Serialize, Deserialize};
@@ -161,8 +160,17 @@ fn run_command(alias: &str, command: &str, arg: &str) {
     println!("-------------------------");
     
     let default_shell = env::var("SHELL").expect("No default shell set!");
-    let output = cmd!(&format!("{} -c \"{} {}\"", default_shell, command, arg)).stdout_utf8().unwrap();
-    println!("{}", output);
+    let cmd = Command::new(default_shell)
+        .args(&["-c", command])
+        .spawn()
+        .expect("Failed to create process.")
+        .wait_with_output();
+    match cmd {
+        Ok(output) => {
+            println!("{:?}", String::from_utf8_lossy(&output.stdout));
+        }
+        Err(why) => panic!("error when running command: {}", why)
+    };
 
     println!("-------------------------");
     println!("Script complete");
