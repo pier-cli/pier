@@ -36,21 +36,7 @@ fn main() {
 
     let config = &mut load_config(&matches);
 
-    match matches.value_of("INPUT") {
-        Some(alias) => {
-            // let arg = match sub_matches.value_of("arg") {
-            //     Some(arg) => String::from(arg),
-            //     None => String::from("")
-            // };
-            let arg = String::from("");
-
-            match fetch_script(alias, config) {
-                Some(script) => run_command(alias, &script.command, &arg),
-                None => println!("Invalid alias, would you like to create a new script?"),
-            }
-        },
-        None => handle_subcommands(&matches, config).expect("No input or subcommands"),
-    }    
+    handle_subcommands(&matches, config).expect("No input or subcommands");
 }
 
 fn handle_subcommands(matches: &clap::ArgMatches, config: & mut Config) -> Result<(),Error> {
@@ -140,8 +126,14 @@ fn handle_subcommands(matches: &clap::ArgMatches, config: & mut Config) -> Resul
                 None => println!("No scripts exist. Would you like to add a new script?")
             }
         },
-        ("", None) => println!("No subcommand was used"),
-        _          => unreachable!(),
+        _ => {
+            let alias = matches.value_of("INPUT").unwrap();
+            let arg = "";
+            match fetch_script(alias, config) {
+                Some(script) => run_command(alias, &script.command, &arg),
+                None => println!("Invalid alias, would you like to create a new script?"),
+            }
+        }
     }
 
     Ok(())
