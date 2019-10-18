@@ -4,14 +4,13 @@ use std::env;
 use std::process;
 use std::collections::HashMap;
 use std::path::Path;
+use std::process::Command;
 
 use clap::load_yaml;
 use clap::App;
 
 #[macro_use] extern crate prettytable;
 use prettytable::{Table, Row, Cell, format};
-
-#[macro_use] extern crate shell;
 
 use toml;
 use serde::{Serialize, Deserialize};
@@ -36,21 +35,7 @@ fn main() {
 
     let config = &mut load_config(&matches);
 
-    match matches.value_of("INPUT") {
-        Some(alias) => {
-            // let arg = match sub_matches.value_of("arg") {
-            //     Some(arg) => String::from(arg),
-            //     None => String::from("")
-            // };
-            let arg = String::from("");
-
-            match fetch_script(alias, config) {
-                Some(script) => run_command(alias, &script.command, &arg),
-                None => println!("Invalid alias, would you like to create a new script?"),
-            }
-        },
-        None => handle_subcommands(&matches, config).expect("No input or subcommands"),
-    }    
+    handle_subcommands(&matches, config).expect("No input or subcommands");
 }
 
 fn handle_subcommands(matches: &clap::ArgMatches, config: & mut Config) -> Result<(),Error> {
@@ -140,8 +125,14 @@ fn handle_subcommands(matches: &clap::ArgMatches, config: & mut Config) -> Resul
                 None => println!("No scripts exist. Would you like to add a new script?")
             }
         },
-        ("", None) => println!("No subcommand was used"),
-        _          => unreachable!(),
+        _ => {
+            let alias = matches.value_of("INPUT").unwrap();
+            let arg = "";
+            match fetch_script(alias, config) {
+                Some(script) => run_command(alias, &script.command, &arg),
+                None => println!("Invalid alias, would you like to create a new script?"),
+            }
+        }
     }
 
     Ok(())
@@ -161,8 +152,17 @@ fn run_command(alias: &str, command: &str, arg: &str) {
     println!("-------------------------");
     
     let default_shell = env::var("SHELL").expect("No default shell set!");
-    let output = cmd!(&format!("{} -c \"{} {}\"", default_shell, command, arg)).stdout_utf8().unwrap();
-    println!("{}", output);
+    let cmd = Command::new(default_shell)
+        .args(&["-c", command])
+        .spawn()
+        .expect("Failed to create process.")
+        .wait_with_output();
+    match cmd {
+        Ok(output) => {
+            println!("{:?}", String::from_utf8_lossy(&output.stdout));
+        }
+        Err(why) => panic!("error when running command: {}", why)
+    };
 
     println!("-------------------------");
     println!("Script complete");
@@ -204,9 +204,6 @@ fn load_config(matches: &clap::ArgMatches) -> Config {
 fn get_config_dir(matches: &clap::ArgMatches) -> String {
     if matches.is_present("config") {
         matches.value_of("config").unwrap().to_string()
-    } else if let Ok(pier_config_path_env) = env::var("PIER_CONFIG_PATH") {
-        // Adds possibility of user defined config path.
-        pier_config_path_env
     } else {
         let home_dir = env::var("HOME").expect("$HOME variable not set");
 

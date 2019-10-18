@@ -8,7 +8,6 @@ edition = "2018"
 clap = {version = "~2.27.0", features = ["yaml"]}
 toml = "0.4"
 serde = { version = '1.0.83', features = ['derive'] }
-shell = { git = "https://github.com/google/rust-shell" }
 prettytable-rs = "^0.8"
 
 [dev-dependencies]
