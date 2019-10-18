@@ -11,6 +11,7 @@ args:
         short: c
         long: config
         value_name: FILE
+        env: PIER_CONFIG_PATH
         long_help: |
             Sets a custom config file.
 
