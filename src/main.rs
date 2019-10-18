@@ -201,9 +201,6 @@ fn load_config(matches: &clap::ArgMatches) -> Config {
 fn get_config_dir(matches: &clap::ArgMatches) -> String {
     if matches.is_present("config") {
         matches.value_of("config").unwrap().to_string()
-    } else if let Ok(pier_config_path_env) = env::var("PIER_CONFIG_PATH") {
-        // Adds possibility of user defined config path.
-        pier_config_path_env
     } else {
         let home_dir = env::var("HOME").expect("$HOME variable not set");
 
