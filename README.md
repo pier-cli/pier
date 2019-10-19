@@ -1,6 +1,7 @@
 # **pier** ~ A Linux script management tool
 [![Build Status](https://travis-ci.com/BenSchZA/pier.svg?branch=master)](https://travis-ci.com/BenSchZA/pier)
 
+**THANKS:** To @Plommonsorbet for the great improvements to the shell
 **NEW:** Nix derivation
 **COMING SOON:** Syntax highlighting
 
