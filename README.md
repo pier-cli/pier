@@ -2,7 +2,9 @@
 [![Build Status](https://travis-ci.com/BenSchZA/pier.svg?branch=master)](https://travis-ci.com/BenSchZA/pier)
 
 **THANKS:** To @Plommonsorbet for the great improvements to the shell
+
 **NEW:** Nix derivation
+
 **COMING SOON:** Syntax highlighting
 
 A central repository to manage all your one-liners, scripts, tools, and CLIs. Add, remove, list, and run scripts - storing metadata to easily find them later. No more digging through your `bin` folder...
