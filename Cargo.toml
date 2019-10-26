@@ -9,7 +9,7 @@ license-file = "./LICENSE"
 description = "A Linux script management tool"
 homepage = "https://github.com/BenSchZA/pier"
 documentation = "https://github.com/BenSchZA/pier/blob/master/README.md"
-repository = "git@github.com:BenSchZA/pier.git"
+repository = "https://github.com/BenSchZA/pier.git"
 keywords = ["cli", "productivity", "tool", "devops", "management"]
 categories = ["Command line utilities"]
 
