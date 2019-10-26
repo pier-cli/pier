@@ -11,7 +11,7 @@ homepage = "https://github.com/BenSchZA/pier"
 documentation = "https://github.com/BenSchZA/pier/blob/master/README.md"
 repository = "https://github.com/BenSchZA/pier.git"
 keywords = ["cli", "productivity", "tool", "devops", "management"]
-categories = ["Command line utilities"]
+categories = ["command-line-utilities"]
 
 edition = "2018"
 
