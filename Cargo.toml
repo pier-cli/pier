@@ -1,6 +1,6 @@
 [package]
 name = "pier"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     "Benjamin Scholtz <bscholtz.bds@gmail.com>",
     "Isak Johansson"
