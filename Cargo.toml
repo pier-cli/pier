@@ -1,7 +1,18 @@
 [package]
 name = "pier"
-version = "0.1.0"
-authors = ["Benjamin Scholtz <bscholtz.bds@gmail.com>"]
+version = "0.1.1"
+authors = [
+    "Benjamin Scholtz <bscholtz.bds@gmail.com>",
+    "Isak Johansson"
+]
+license-file = "./LICENSE"
+description = "A Linux script management tool"
+homepage = "https://github.com/BenSchZA/pier"
+documentation = "https://github.com/BenSchZA/pier/blob/master/README.md"
+repository = "https://github.com/BenSchZA/pier.git"
+keywords = ["cli", "productivity", "tool", "devops", "management"]
+categories = ["command-line-utilities"]
+
 edition = "2018"
 
 [dependencies]

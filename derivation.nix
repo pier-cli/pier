@@ -4,7 +4,7 @@ let
 in
 with nixpkgs; rustPlatform.buildRustPackage rec {
   name = "pier-${version}";
-  version = "v0.2.0";
+  version = "v0.1.0";
 
   src = fetchFromGitHub {
     owner = "BenSchZA";
