@@ -1,5 +1,6 @@
 # **pier** ~ A Linux script management tool
 [![Build Status](https://travis-ci.com/BenSchZA/pier.svg?branch=master)](https://travis-ci.com/BenSchZA/pier)
+![Crates.io](https://img.shields.io/crates/v/pier)
 
 **THANKS:** To @Plommonsorbet for the great improvements to the shell
 
