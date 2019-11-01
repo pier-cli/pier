@@ -22,9 +22,11 @@ The idea behind `pier` is to create a central repository for all your scripts, a
 
 ## Installation
 
-From GitHub release: simply download the release binary
+From **Crates.io**: `cargo install pier`
 
-Using Nix package manager:
+From **GitHub release**: simply download the release binary
+
+Using **Nix** package manager:
 1. From GitHub release: `make install` or `nix-env -if derivation.nix`
 2. From source: update `src` in derivation to `./.`
 
