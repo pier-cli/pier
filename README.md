@@ -50,13 +50,13 @@ OPTIONS:
     -c, --config <FILE>    Sets a custom config file.
                            
                            DEFAULT PATH is otherwise determined in this order:
-                             - "pier.toml"
-                             - "$PIER_CONFIG_PATH"
-                             - "$XDG_CONFIG_HOME/pier/config.toml"
-                             - "$XDG_CONFIG_HOME/pier/config"
-                             - "$XDG_CONFIG_HOME/pier.toml"
-                             - "$HOME/.pier.toml"
-                             - "$HOME/.pier"
+                             - $PIER_CONFIG_PATH (environment variable if set)
+                             - pier.toml (in the current directory)
+                             - $XDG_CONFIG_HOME/pier/config.toml
+                             - $XDG_CONFIG_HOME/pier/config
+                             - $XDG_CONFIG_HOME/pier.toml
+                             - $HOME/.pier.toml
+                             - $HOME/.pier
                             [env:PIER_CONFIG_PATH: ]
 
 ARGS:
