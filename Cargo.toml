@@ -15,14 +15,23 @@ categories = ["command-line-utilities"]
 
 edition = "2018"
 
+autotests = false
+
 [dependencies]
 clap = {version = "~2.27.0", features = ["yaml"]}
 toml = "0.4"
 serde = { version = '1.0.83', features = ['derive'] }
 prettytable-rs = "^0.8"
+enum-kinds = "0.4.1"
+dirs = "2.0.2"
+snafu = "0.5.0"
 
 [dev-dependencies]
 assert_cmd = "0.11.1"
 predicates = "1.0"
 assert_fs = "0.11"
 serde = { version = '1.0.83', features = ['derive'] }
+
+[[test]]
+name = "integration"
+path = "tests/tests.rs"

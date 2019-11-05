@@ -1,5 +1,5 @@
 name: pier
-version: "0.2.1"
+version: "0.2.2"
 author: Benjamin Scholtz <bscholtz.bds@gmail.com>
 about: A simple Docker script management CLI
 settings:
@@ -9,6 +9,11 @@ args:
         help: alias/name for script to run
         required: true
         index: 1
+    - verbose:
+        short: v
+        long: verbose
+        takes_value: false
+        help: The level of verbosity
     - config:
         short: c
         long: config
@@ -18,10 +23,13 @@ args:
             Sets a custom config file.
 
             DEFAULT PATH is otherwise determined in this order:
-            1. "$PIER_CONFIG_PATH"
-            2. "$XDG_CONFIG_HOME/pier/config"
-            3. "$HOME/.config/pier/config"
-            4. "$HOME/.pier")
+              - $PIER_CONFIG_PATH (environment variable if set)
+              - pier.toml (in the current directory)
+              - $XDG_CONFIG_HOME/pier/config.toml
+              - $XDG_CONFIG_HOME/pier/config
+              - $XDG_CONFIG_HOME/pier.toml
+              - $HOME/.pier.toml
+              - $HOME/.pier
         takes_value: true
     # - accept:
     #     short: y

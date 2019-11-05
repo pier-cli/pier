@@ -35,24 +35,31 @@ Using **Nix** package manager:
 See `src/cli.yml` for a more detailed spec.
 
 ```
-pier 0.2.1
+pier 0.2.2
+Benjamin Scholtz <bscholtz.bds@gmail.com>
 A simple Docker script management CLI
 
 USAGE:
-    pier [OPTIONS] [INPUT] [SUBCOMMAND]
+    pier [FLAGS] [OPTIONS] <INPUT>
+    pier [FLAGS] [OPTIONS] <SUBCOMMAND>
 
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
+    -v, --verbose    The level of verbosity
 
 OPTIONS:
     -c, --config <FILE>    Sets a custom config file.
                            
                            DEFAULT PATH is otherwise determined in this order:
-                           1. "$PIER_CONFIG_PATH"
-                           2. "$XDG_CONFIG_HOME/pier/config"
-                           3. "$HOME/.config/pier/config"
-                           4. "$HOME/.pier"
+                             - $PIER_CONFIG_PATH (environment variable if set)
+                             - pier.toml (in the current directory)
+                             - $XDG_CONFIG_HOME/pier/config.toml
+                             - $XDG_CONFIG_HOME/pier/config
+                             - $XDG_CONFIG_HOME/pier.toml
+                             - $HOME/.pier.toml
+                             - $HOME/.pier
+                            [env:PIER_CONFIG_PATH: ]
 
 ARGS:
     <INPUT>    alias/name for script to run
