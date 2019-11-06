@@ -20,7 +20,7 @@ pier_test!(lib => test_error_no_scripts_exists, cfg => r#""#,
 | _cfg: ChildPath, mut lib: Config | {
     err_eq!(lib.remove_script(""), NoScriptsExists);
     err_eq!(lib.fetch_script(""), NoScriptsExists);
-    err_eq!(lib.list_scripts(), NoScriptsExists);
+    err_eq!(lib.list_scripts(None), NoScriptsExists);
 });
 
 // Tests that it returns the error ConfigRead if the file cannot be read. 

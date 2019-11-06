@@ -30,12 +30,16 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
         ("add", Some(sub_matches)) => {
             let command = sub_matches.value_of("INPUT").unwrap().to_string();
             let alias = sub_matches.value_of("alias").unwrap().to_string();
+            let tags: Option<Vec<String>> = match sub_matches.values_of("tags") {
+                Some(values) => Some(values.map(|tag| tag.to_string()).collect()),
+                None => None 
+            };
             let appendage = Script {
                 alias,
                 command,
                 description: None,
                 reference: None,
-                tags: None,
+                tags,
             };
 
             config.add_script(appendage)?;
@@ -53,8 +57,12 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
 
             script.run(arg)?;
         }
-        ("list", Some(_sub_matches)) => {
-            config.list_scripts()?;
+        ("list", Some(sub_matches)) => {
+            let tags: Option<Vec<String>> = match sub_matches.values_of("tags") {
+                Some(values) => Some(values.map(|tag| tag.to_string()).collect()),
+                None => None 
+            };
+            config.list_scripts(tags)?;
         }
         _ => {
             let arg = "";
