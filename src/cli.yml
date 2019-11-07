@@ -1,5 +1,5 @@
 name: pier
-version: "0.2.2"
+version: "0.2.3"
 author: Benjamin Scholtz
 about: A simple Docker script management CLI
 settings:
@@ -49,6 +49,12 @@ subcommands:
                 required: true
                 help: alias/name for script
                 takes_value: true
+            - tags:
+                short: t
+                long: tags
+                help: tags for script
+                takes_value: true
+                multiple: true
             # - description:
             #     short: d
             #     long: description
@@ -59,12 +65,6 @@ subcommands:
             #     long: reference
             #     help: reference for script
             #     takes_value: true
-            # - tags:
-            #     short: t
-            #     long: tags
-            #     help: tags for script
-            #     takes_value: true
-            #     multiple: true
     - remove:
         about: Remove a script using alias
         args:
@@ -97,6 +97,12 @@ subcommands:
                 long: alias
                 help: alias/name for script
                 takes_value: true
+            - tags:
+                short: t
+                long: tags
+                help: tags for script
+                takes_value: true
+                multiple: true
             # - tags:
             #     short: t
             #     long: tags

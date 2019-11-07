@@ -133,13 +133,33 @@ impl Config {
     }
 
     /// Prints a terminal table of the scripts
-    pub fn list_scripts(&self) -> Result<()> {
+    pub fn list_scripts(&self, tags: Option<Vec<String>>) -> Result<()> {
         ensure!(!self.scripts.is_empty(), NoScriptsExists);
         let mut table = Table::new();
         table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-        table.set_titles(row!["Alias", "Command"]);
+        table.set_titles(row!["Alias", "tags", "Command"]);
         for (alias, script) in &self.scripts {
-            table.add_row(row![&alias, &script.command]);
+            match (&tags, &script.tags) {
+                (Some(list_tags), Some(script_tags)) => {
+                    for tag in list_tags {
+                        if script_tags.contains(tag) {
+                            table.add_row(row![&alias, script_tags.join(","), &script.command]);
+                            continue;
+                        }
+                    }
+                }
+                (None, Some(script_tags)) => {
+                    table.add_row(row![&alias, script_tags.join(","), &script.command]);
+                    continue;
+
+                }
+                (None, None) => {
+                    table.add_row(row![&alias, "", &script.command]);
+                    continue;
+                }
+                _ => ()
+                
+            };
         }
 
         table.printstd();

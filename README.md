@@ -35,7 +35,8 @@ Using **Nix** package manager:
 See `src/cli.yml` for a more detailed spec.
 
 ```
-pier 0.2.2
+pier 0.2.3
+Benjamin Scholtz
 A simple Docker script management CLI
 
 USAGE:
@@ -69,6 +70,7 @@ SUBCOMMANDS:
     list      List all scripts with optional filters
     remove    Remove a script using alias
     run       Run script
+
 ```
 
 `pier list`, `pier add "ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up" --alias refresh-wifi`, `pier refresh-wifi`
