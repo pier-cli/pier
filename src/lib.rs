@@ -1,7 +1,7 @@
 use prettytable::{cell, format, row, Table};
 use serde::{Deserialize, Serialize};
 use snafu::{ensure, OptionExt, ResultExt};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -25,9 +25,9 @@ pub struct CliOptions {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    // Don't write anything to config if hashmap is empty
-    #[serde(default = "HashMap::new", skip_serializing_if = "HashMap::is_empty")]
-    scripts: HashMap<String, Script>,
+    // Don't write anything to config if map is empty
+    #[serde(default = "BTreeMap::new", skip_serializing_if = "BTreeMap::is_empty")]
+    scripts: BTreeMap<String, Script>,
     #[serde(skip)]
     pub path: PathBuf,
     #[serde(skip)]
@@ -47,7 +47,7 @@ impl Config {
     // Generates a new empty config
     pub fn new() -> Config {
         Config {
-            scripts: HashMap::new(),
+            scripts: BTreeMap::new(),
             path: PathBuf::from(""),
             opts: CliOptions { verbose: false },
         }
