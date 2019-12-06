@@ -72,6 +72,19 @@ subcommands:
                 required: true
                 index: 1
                 help: alias/name for script
+
+    - show:
+        about: Show script
+        args:
+            - INPUT:
+                required: true
+                index: 1
+                help: alias/name for script
+            #- arg:
+            #    short: a
+            #    long: arg
+            #    help: pass argument to script
+            #    takes_value: true
     - run:
         about: Run script
         args:
