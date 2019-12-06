@@ -40,9 +40,9 @@ subcommands:
         about: Add a script using alias
         args:
             - INPUT:
-                required: true
+                required: false
                 index: 1
-                help: the script to save
+                help: The script to save. If this argument is not found it will open your $EDITOR for you to enter the script into.
             - alias:
                 short: a
                 long: alias
@@ -67,6 +67,13 @@ subcommands:
             #     takes_value: true
     - remove:
         about: Remove a script using alias
+        args:
+            - INPUT:
+                required: true
+                index: 1
+                help: alias/name for script
+    - edit:
+        about: Edit a script using alias
         args:
             - INPUT:
                 required: true
