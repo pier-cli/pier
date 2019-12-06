@@ -9,10 +9,12 @@ const CONFIG_1: &'static str = r#"
 [scripts.test_cmd_1]
 alias = 'test_cmd_1'
 command = 'echo test_1' 
+tags = ['info', 'echo', 'grp_1']
 
 [scripts.test_cmd_2]
 alias = 'test_cmd_2'
 command = 'echo test_2' 
+tags = ['debug', 'echo']
 "#;
 
 // Tests listing all scripts
@@ -20,7 +22,43 @@ pier_test!(cli => test_list_scripts, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
     // TODO Add some way to verify the output other than exit code.
     cmd.arg("list");
-    cmd.assert().success();
+    cmd.assert()
+        .success();
+});
+
+// Tests listing all aliases
+pier_test!(cli => test_list_aliases, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["list", "-q"]);
+    cmd.assert()
+        .success()
+        .stdout(contains(trim!(r#"
+        test_cmd_1
+        test_cmd_2
+    "#)).trim()
+    );
+});
+
+// Tests listing all aliases with matching tag
+pier_test!(cli => test_list_alias_with_matching_tag, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["list", "-q", "-t", "info"]);
+    cmd.assert()
+        .success()
+        .stdout(contains(trim!(r#"
+        test_cmd_1
+    "#)).trim()
+    );
+});
+
+// Tests that no aliases is listed when no tag is matched
+pier_test!(cli => test_list_without_tag_match, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["list", "-q", "-t", "bad_tag"]);
+    cmd.assert()
+        .success()
+        .stdout(contains("").trim()
+    );
 });
 
 // Tests adding a script
