@@ -51,6 +51,27 @@ pier_test!(cli => test_remove_script, cfg => CONFIG_1,
 
 });
 
+// Tests show a script
+pier_test!(cli => test_show_script, cfg => r#"
+[scripts.test_show]
+alias = 'test_show'
+command = '''
+for line in l1 l2 l3 l4; do
+    echo "$line"
+done
+'''
+"#,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["show", "test_show"]);
+    cmd.assert()
+        .success()
+        .stdout(contains(trim!(r#"
+            for line in l1 l2 l3 l4; do
+                echo "$line"
+            done"#
+        )));
+});
+
 // Tests running a very basic script
 pier_test!(cli => test_run_script, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {

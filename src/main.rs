@@ -57,6 +57,12 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
 
             script.run(arg)?;
         }
+        ("show", Some(sub_matches)) => {
+            let alias = sub_matches.value_of("INPUT").unwrap();
+            let script = config.fetch_script(&alias)?;
+            
+            println!("{}", script.command);
+        }
         ("list", Some(sub_matches)) => {
             let tags: Option<Vec<String>> = match sub_matches.values_of("tags") {
                 Some(values) => Some(values.map(|tag| tag.to_string()).collect()),
