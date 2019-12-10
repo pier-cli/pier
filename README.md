@@ -35,7 +35,7 @@ Using **Nix** package manager:
 See `src/cli.yml` for a more detailed spec.
 
 ```
-pier 0.2.3
+pier 0.1.2
 Benjamin Scholtz
 A simple Docker script management CLI
 
