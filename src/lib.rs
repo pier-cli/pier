@@ -186,9 +186,17 @@ impl Script {
             .wait_with_output()
             .context(CommandExec)?;
 
-        println!("{}", String::from_utf8_lossy(&cmd.stdout));
+        let stdout = String::from_utf8_lossy(&cmd.stdout);
+        let stderr = String::from_utf8_lossy(&cmd.stderr);
 
-        eprintln!("{}", String::from_utf8_lossy(&cmd.stderr));
+        if stdout.len() > 0 {
+            println!("{}", stdout);
+
+        };
+        if stdout.len() > 0 {
+            eprintln!("{}", stderr);
+
+        };
 
         if opts.verbose { 
             println!("Starting script \"{}\"", &self.alias);
