@@ -2,7 +2,7 @@ use clap::load_yaml;
 use clap::App;
 use std::process;
 
-use pier::{CliOptions, Config, Result, Script};
+use pier::{CliOptions, Config, Result, Script, editor};
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
@@ -28,7 +28,10 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
 
     match matches.subcommand() {
         ("add", Some(sub_matches)) => {
-            let command = sub_matches.value_of("INPUT").unwrap().to_string();
+            let command = match sub_matches.value_of("INPUT") {
+                Some(cmd) => cmd.to_string(),
+                None => editor("")?
+            };
             let alias = sub_matches.value_of("alias").unwrap().to_string();
             let tags: Option<Vec<String>> = match sub_matches.values_of("tags") {
                 Some(values) => Some(values.map(|tag| tag.to_string()).collect()),
@@ -44,6 +47,26 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
 
             config.add_script(appendage)?;
             config.write()?;
+        }
+        ("edit", Some(sub_matches)) => {
+            let alias = sub_matches.value_of("INPUT").unwrap();
+            config.edit_script(&alias)?;
+            config.write()?;
+            //let alias = sub_matches.value_of("alias").unwrap().to_string();
+            //let tags: Option<Vec<String>> = match sub_matches.values_of("tags") {
+            //    Some(values) => Some(values.map(|tag| tag.to_string()).collect()),
+            //    None => None 
+            //};
+            //let appendage = Script {
+            //    alias,
+            //    command,
+            //    description: None,
+            //    reference: None,
+            //    tags,
+            //};
+
+            //config.add_script(appendage)?;
+            //config.write()?;
         }
         ("remove", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();

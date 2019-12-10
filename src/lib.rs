@@ -13,6 +13,7 @@ pub mod error;
 mod macros;
 use dirs;
 use error::*;
+use scrawl;
 
 // Creates a Result type that return PierError by default
 pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
@@ -41,6 +42,10 @@ pub struct Script {
     pub description: Option<String>,
     pub reference: Option<String>,
     pub tags: Option<Vec<String>>,
+}
+
+pub fn editor(content: &str) -> Result<String> {
+    Ok(scrawl::editor::new().contents(content).open().context(EditorError)?)
 }
 
 impl Config {
@@ -102,7 +107,7 @@ impl Config {
         }
     }
 
-    /// Fetches a Script that matches the alias
+    /// Fetches a script that matches the alias
     pub fn fetch_script(&self, alias: &str) -> Result<&Script> {
         ensure!(!self.scripts.is_empty(), NoScriptsExists);
         let script = self
@@ -114,6 +119,18 @@ impl Config {
         Ok(script)
     }
 
+    /// Edits a script that matches the alias
+    pub fn edit_script(&mut self, alias: &str) -> Result<&Script> {
+        ensure!(!self.scripts.is_empty(), NoScriptsExists);
+        let mut script = self
+            .scripts
+            .get_mut(&alias.to_string())
+            .context(AliasNotFound {
+                alias: &alias.to_string(),
+            })?;
+        script.command = editor(&script.command)?;
+        Ok(script)
+    }
     /// Removes a script that matches the alias
     pub fn remove_script(&mut self, alias: &str) -> Result<()> {
         ensure!(!self.scripts.is_empty(), NoScriptsExists);

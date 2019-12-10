@@ -25,6 +25,7 @@ prettytable-rs = "^0.8"
 enum-kinds = "0.4.1"
 dirs = "2.0.2"
 snafu = "0.5.0"
+scrawl = "1.1.0"
 
 [dev-dependencies]
 assert_cmd = "0.11.1"
