@@ -78,7 +78,7 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
             let alias = sub_matches.value_of("INPUT").unwrap();
             let script = config.fetch_script(&alias)?;
 
-            script.run(arg)?;
+            script.run(&config.opts, arg)?;
         }
         ("show", Some(sub_matches)) => {
             let alias = sub_matches.value_of("INPUT").unwrap();
@@ -97,7 +97,7 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
             let arg = "";
             let alias = matches.value_of("INPUT").unwrap();
             let script = config.fetch_script(&alias)?;
-            script.run(arg)?;
+            script.run(&config.opts, arg)?;
         }
     };
     Ok(())

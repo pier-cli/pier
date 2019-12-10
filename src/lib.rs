@@ -187,9 +187,12 @@ impl Config {
 
 impl Script {
     /// Runs a script and print stdout and stderr of the command.
-    pub fn run(&self, arg: &str) -> Result<()> {
-        println!("Starting script \"{}\"", &self.alias);
-        println!("-------------------------");
+    pub fn run(&self, opts: &CliOptions, arg: &str) -> Result<()> {
+        if opts.verbose { 
+            println!("Starting script \"{}\"", &self.alias);
+            println!("-------------------------");
+        };
+
         let default_shell = env::var("SHELL").context(NoDefaultShell)?;
 
         let cmd = Command::new(default_shell)
@@ -200,12 +203,23 @@ impl Script {
             .wait_with_output()
             .context(CommandExec)?;
 
-        println!("{}", String::from_utf8_lossy(&cmd.stdout));
+        let stdout = String::from_utf8_lossy(&cmd.stdout);
+        let stderr = String::from_utf8_lossy(&cmd.stderr);
 
-        eprintln!("{}", String::from_utf8_lossy(&cmd.stderr));
+        if stdout.len() > 0 {
+            println!("{}", stdout);
 
-        println!("-------------------------");
-        println!("Script complete");
+        };
+        if stdout.len() > 0 {
+            eprintln!("{}", stderr);
+
+        };
+
+        if opts.verbose { 
+            println!("Starting script \"{}\"", &self.alias);
+            println!("-------------------------");
+        };
+
         Ok(())
     }
 }
