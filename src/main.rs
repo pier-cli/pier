@@ -91,7 +91,11 @@ fn handle_subcommands(matches: &clap::ArgMatches) -> Result<()> {
                 Some(values) => Some(values.map(|tag| tag.to_string()).collect()),
                 None => None 
             };
-            config.list_scripts(tags)?;
+
+            match sub_matches.is_present("list_aliases") {
+                true => config.list_aliases(tags)?,
+                false => config.list_scripts(tags)?
+            }
         }
         _ => {
             let arg = "";

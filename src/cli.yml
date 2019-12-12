@@ -123,6 +123,11 @@ subcommands:
                 help: tags for script
                 takes_value: true
                 multiple: true
+            - list_aliases:
+                short: q
+                long: list-aliases
+                takes_value: false
+                help: Only displays aliases
             # - tags:
             #     short: t
             #     long: tags

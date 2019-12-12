@@ -149,7 +149,33 @@ impl Config {
         Ok(())
     }
 
-    /// Prints a terminal table of the scripts
+    /// Prints only the aliases in current config file that matches tags.
+    pub fn list_aliases(&self, tags: Option<Vec<String>>) -> Result<()> {
+        ensure!(!self.scripts.is_empty(), NoScriptsExists);
+        for (alias, script) in &self.scripts {
+            match (&tags, &script.tags) {
+                (Some(list_tags), Some(script_tags)) => {
+                    for tag in list_tags {
+                        if script_tags.contains(tag) {
+                            println!("{}", alias);
+                            continue;
+                        }
+                    }
+                }
+                (None, _) => {
+                    println!("{}", alias);
+                    continue;
+
+                }
+                _ => ()
+                
+            };
+        }
+
+        Ok(())
+    }
+
+    /// Prints a terminal table of the scripts in current config file that matches tags.
     pub fn list_scripts(&self, tags: Option<Vec<String>>) -> Result<()> {
         ensure!(!self.scripts.is_empty(), NoScriptsExists);
         let mut table = Table::new();
