@@ -236,14 +236,14 @@ impl Script {
             println!("{}", stdout);
 
         };
-        if stdout.len() > 0 {
+        if stderr.len() > 0 {
             eprintln!("{}", stderr);
 
         };
 
         if opts.verbose { 
-            println!("Starting script \"{}\"", &self.alias);
             println!("-------------------------");
+            println!("Script complete");
         };
 
         Ok(())

@@ -132,7 +132,7 @@ command = '''
         .success()
         .stdout(contains("test_run_script_pipe_output"));
 });
-//
+
 // Tests running a script which requires waiting for the process to end. 
 pier_test!(cli => test_run_script_non_blocking, cfg => r#"
 [scripts.test_while_loop]
@@ -158,4 +158,18 @@ command = '''
     cmd.assert()
         .success()
         .stdout(contains("test-x-1\ntest-x-2"));
+});
+
+// Tests that stderr is printed when the command outputs it.
+pier_test!(cli => test_stderr_output, cfg => r#"
+[scripts.write_to_stderr]
+alias = "write_to_stderr"
+command = '''
+    echo "WRITE THIS TO STDERR" >&2
+'''
+"#, | _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["run", "write_to_stderr"]);
+    cmd.assert()
+        .success()
+        .stderr(contains("WRITE THIS TO STDERR"));
 });
