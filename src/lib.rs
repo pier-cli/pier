@@ -328,7 +328,6 @@ impl Script {
             eprintln!("{}", stderr);
         };
 
-
         if verbose {
             println!("-------------------------");
             println!("Script complete");
