@@ -8,6 +8,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 use std::process::Stdio;
+use structopt::{clap::AppSettings, StructOpt};
 use toml;
 pub mod error;
 mod macros;
@@ -18,21 +19,17 @@ use scrawl;
 // Creates a Result type that return PierError by default
 pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
 
-// Struct containing Extra Options.
-#[derive(Debug, Default)]
-pub struct CliOptions {
-    pub verbose: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
     // Don't write anything to config if map is empty
     #[serde(default = "BTreeMap::new", skip_serializing_if = "BTreeMap::is_empty")]
     scripts: BTreeMap<String, Script>,
+
+    #[serde(skip)]
+    pub verose: bool,
+
     #[serde(skip)]
     pub path: PathBuf,
-    #[serde(skip)]
-    pub opts: CliOptions,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -44,46 +41,141 @@ pub struct Script {
     pub tags: Option<Vec<String>>,
 }
 
-pub fn editor(content: &str) -> Result<String> {
-    Ok(scrawl::editor::new().contents(content).open().context(EditorError)?)
+#[derive(Debug, StructOpt)]
+pub enum CliSubcommand {
+    /// Add a new script to config.
+
+    Add {
+        /// The command/script content to be executed.
+        /// If this argument is not found it will open your $EDITOR for you to enter the script into.
+        command: Option<String>,
+
+        /// The alias or name for the script.
+        #[structopt(short = "a", long = "alias")]
+        alias: String,
+
+        /// Set which tags the script belongs to.
+        #[structopt(short = "t", long = "tag")]
+        tags: Option<Vec<String>>,
+    },
+    /// alias: rm - Remove a script matching alias.
+    #[structopt(alias = "rm")]
+    Remove {
+        /// The alias or name for the script.
+        alias: String,
+    },
+    /// Edit a script matching alias.
+    Edit {
+        /// The alias or name for the script.
+        alias: String,
+    },
+    /// Show a script matching alias.
+    Show {
+        /// The alias or name for the script.
+        alias: String,
+    },
+    /// Run a script matching alias.
+    Run {
+        /// The alias or name for the script.
+        alias: String,
+        //#[structopt(short = "a", long = "arg")]
+        //arg: String,
+    },
+    /// alias: ls - List scripts
+    #[structopt(alias = "ls")]
+    List {
+        /// Only displays aliases of the scripts.
+        #[structopt(short = "q", long = "list_aliases")]
+        list_aliases: bool,
+
+        /// Filter based on tags.
+        #[structopt(short = "t", long = "tag")]
+        tags: Option<Vec<String>>,
+    },
+}
+
+#[derive(Debug, StructOpt)]
+#[structopt(setting = AppSettings::SubcommandsNegateReqs, author)]
+/// A simple script management CLI
+pub struct Cli {
+    /// The level of verbosity
+    #[structopt(short = "v", long = "verbose")]
+    pub verbose: bool,
+
+    /// Sets a custom config file.
+    ///
+    /// DEFAULT PATH is otherwise determined in this order:
+    ///
+    ///   - $PIER_CONFIG_PATH (environment variable if set)
+    ///
+    ///   - pier.toml (in the current directory)
+    ///
+    ///   - $XDG_CONFIG_HOME/pier/config.toml
+    ///
+    ///   - $XDG_CONFIG_HOME/pier/config
+    ///
+    ///   - $XDG_CONFIG_HOME/pier.toml
+    ///
+    ///   - $HOME/.pier.toml
+    ///
+    ///   - $HOME/.pier
+    ///
+    #[structopt(short = "c", long = "config-file", env = "PIER_CONFIG_PATH")]
+    pub path: Option<PathBuf>,
+
+    /// The alias or name for the script.
+    #[structopt(required_unless="cmd")]
+    pub alias: Option<String>,
+
+        
+    /// Pier subcommands
+    #[structopt(subcommand)] 
+    pub cmd: Option<CliSubcommand>,
+}
+
+pub fn open_editor(content: Option<&str>) -> Result<String> {
+    let edited_text = scrawl::editor::new()
+        .contents(match content {
+            Some(txt) => txt,
+            None => "",
+        })
+        .open()
+        .context(EditorError)?;
+    Ok(edited_text)
 }
 
 impl Config {
     // Generates a new empty config
     pub fn new() -> Config {
-        Config {
-            scripts: BTreeMap::new(),
-            path: PathBuf::from(""),
-            opts: CliOptions { verbose: false },
-        }
+        Config::default()
     }
 
-    /// Helper function to read file
+    /// Helper function to read file.
     fn read(path: &Path) -> Result<String> {
         let file_content = fs::read_to_string(path).context(ConfigRead { path })?;
         Ok(file_content)
     }
 
-    /// Writes the current Config to file
+    /// Writes the current Config to file.
     pub fn write(&self) -> Result<()> {
         let config_string = toml::to_string_pretty(&self).context(TomlSerialize)?;
         fs::write(&self.path, config_string).context(ConfigWrite { path: &self.path })?;
         Ok(())
     }
 
-    /// Generate a new Config based on a file path
-    pub fn from_file(path: &Path) -> Result<Config> {
-        let config_string = Config::read(path)?;
-        let mut config: Config = toml::from_str(&config_string).context(TomlParse { path })?;
-        config.path = path.to_path_buf();
+    /// Generate a new Config based on a file path.
+    pub fn from_file(path: PathBuf) -> Result<Config> {
+        let config_string = Config::read(&path)?;
+        let mut config: Config = toml::from_str(&config_string).context(TomlParse { path: &path })?;
+        config.path = path;
         Ok(config)
     }
 
     /// Generate a new Config from path specified specified with cli flag or environment variable
     /// if no path is specified try to look for any config in a default location.
-    pub fn from_input(selected_path: Option<&str>) -> Result<Config> {
-        if let Some(path_str) = selected_path {
-            Ok(Config::from_file(Path::new(path_str))?)
+    pub fn from_input(selected_path: Option<PathBuf>) -> Result<Config> {
+        if let Some(sel_path) = selected_path {
+            Ok(Config::from_file(sel_path)?)
         } else {
             let default_config_paths: Vec<Option<PathBuf>> = vec![
                 Some(PathBuf::from("pier.toml")),
@@ -99,7 +191,7 @@ impl Config {
             for config_path in default_config_paths {
                 if let Some(path) = config_path {
                     if path.exists() {
-                        return Ok(Config::from_file(&path)?);
+                        return Ok(Config::from_file(path)?);
                     }
                 }
             }
@@ -128,7 +220,8 @@ impl Config {
             .context(AliasNotFound {
                 alias: &alias.to_string(),
             })?;
-        script.command = editor(&script.command)?;
+        script.command = open_editor(Some(&script.command))?;
+        println!("Edited {}", &alias);
         Ok(script)
     }
     /// Removes a script that matches the alias
@@ -139,12 +232,13 @@ impl Config {
             .context(AliasNotFound {
                 alias: &alias.to_string(),
             })?;
+        println!("Removed {}",  &alias);
         Ok(())
     }
 
     /// Adds a script that matches the alias
     pub fn add_script(&mut self, script: Script) -> Result<()> {
-        println!("+ {} / alias {}", &script.command, &script.alias);
+        println!("Added {}", &script.alias);
         self.scripts.insert(script.alias.to_string(), script);
         Ok(())
     }
@@ -165,10 +259,8 @@ impl Config {
                 (None, _) => {
                     println!("{}", alias);
                     continue;
-
                 }
-                _ => ()
-                
+                _ => (),
             };
         }
 
@@ -194,27 +286,24 @@ impl Config {
                 (None, Some(script_tags)) => {
                     table.add_row(row![&alias, script_tags.join(","), &script.command]);
                     continue;
-
                 }
                 (None, None) => {
                     table.add_row(row![&alias, "", &script.command]);
                     continue;
                 }
-                _ => ()
-                
+                _ => (),
             };
         }
 
         table.printstd();
         Ok(())
     }
-
 }
 
 impl Script {
     /// Runs a script and print stdout and stderr of the command.
-    pub fn run(&self, opts: &CliOptions, arg: &str) -> Result<()> {
-        if opts.verbose { 
+    pub fn run(&self, verbose: bool, _arg: &str) -> Result<()> {
+        if verbose {
             println!("Starting script \"{}\"", &self.alias);
             println!("-------------------------");
         };
@@ -234,14 +323,12 @@ impl Script {
 
         if stdout.len() > 0 {
             println!("{}", stdout);
-
         };
         if stderr.len() > 0 {
             eprintln!("{}", stderr);
-
         };
 
-        if opts.verbose { 
+        if verbose {
             println!("-------------------------");
             println!("Script complete");
         };

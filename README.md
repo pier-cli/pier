@@ -35,41 +35,60 @@ Using **Nix** package manager:
 See `src/cli.yml` for a more detailed spec.
 
 ```
-pier 0.1.2
-Benjamin Scholtz
-A simple Docker script management CLI
+pier 0.1.3
+Benjamin Scholtz, Isak Johansson
+A simple script management CLI
 
 USAGE:
-    pier [FLAGS] [OPTIONS] <INPUT>
+    pier [FLAGS] [OPTIONS] <alias>
     pier [FLAGS] [OPTIONS] <SUBCOMMAND>
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-    -v, --verbose    The level of verbosity
+    -h, --help       
+            Prints help information
+
+    -V, --version    
+            Prints version information
+
+    -v, --verbose    
+            The level of verbosity
+
 
 OPTIONS:
-    -c, --config <FILE>    Sets a custom config file.
-                           
-                           DEFAULT PATH is otherwise determined in this order:
-                             - $PIER_CONFIG_PATH (environment variable if set)
-                             - pier.toml (in the current directory)
-                             - $XDG_CONFIG_HOME/pier/config.toml
-                             - $XDG_CONFIG_HOME/pier/config
-                             - $XDG_CONFIG_HOME/pier.toml
-                             - $HOME/.pier.toml
-                             - $HOME/.pier
-                            [env:PIER_CONFIG_PATH: ]
+    -c, --config-file <path>    
+            Sets a custom config file.
+            
+            DEFAULT PATH is otherwise determined in this order:
+            
+            - $PIER_CONFIG_PATH (environment variable if set)
+            
+            - pier.toml (in the current directory)
+            
+            - $XDG_CONFIG_HOME/pier/config.toml
+            
+            - $XDG_CONFIG_HOME/pier/config
+            
+            - $XDG_CONFIG_HOME/pier.toml
+            
+            - $HOME/.pier.toml
+            
+            - $HOME/.pier
+            
+             [env: PIER_CONFIG_PATH=]
 
 ARGS:
-    <INPUT>    alias/name for script to run
+    <alias>    
+            The alias or name for the script.
+
 
 SUBCOMMANDS:
-    add       Add a script using alias
+    add       Add a new script to config.
+    edit      Edit a script matching alias.
     help      Prints this message or the help of the given subcommand(s)
-    list      List all scripts with optional filters
-    remove    Remove a script using alias
-    run       Run script
+    list      alias: ls - List scripts
+    remove    alias: rm - Remove a script matching alias.
+    run       Run a script matching alias.
+    show      Show a script matching alias.
 
 ```
 

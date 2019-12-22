@@ -1,8 +1,8 @@
 [package]
 name = "pier"
-version = "0.1.2"
+version = "0.1.3"
 authors = [
-    "Benjamin Scholtz <bscholtz.bds@gmail.com>",
+    "Benjamin Scholtz",
     "Isak Johansson"
 ]
 license-file = "./LICENSE"
@@ -18,7 +18,6 @@ edition = "2018"
 autotests = false
 
 [dependencies]
-clap = {version = "~2.27.0", features = ["yaml"]}
 toml = "0.4"
 serde = { version = '1.0.83', features = ['derive'] }
 prettytable-rs = "^0.8"
@@ -26,6 +25,7 @@ enum-kinds = "0.4.1"
 dirs = "2.0.2"
 snafu = "0.5.0"
 scrawl = "1.1.0"
+structopt = "0.3"
 
 [dev-dependencies]
 assert_cmd = "0.11.1"
