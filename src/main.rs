@@ -1,7 +1,7 @@
 use std::process;
 use structopt::StructOpt;
 
-use pier::{Cli, CliSubcommand, Config, Result, Script, open_editor};
+use pier::{open_editor, Cli, CliSubcommand, Config, Result, Script};
 
 fn main() {
     let opt = Cli::from_args();
@@ -16,18 +16,23 @@ fn main() {
 /// Handles the commandline subcommands
 fn handle_subcommands(cli: Cli) -> Result<()> {
     let mut config = Config::from_input(cli.path)?;
+    let interpreter = config.get_interpreter();
     if let Some(subcmd) = cli.cmd {
         match subcmd {
-            CliSubcommand::Add { command, alias, tags } => {
-                config.add_script(Script { 
-                    alias, 
+            CliSubcommand::Add {
+                command,
+                alias,
+                tags,
+            } => {
+                config.add_script(Script {
+                    alias,
                     command: match command {
                         Some(cmd) => cmd,
-                        None => open_editor(None)?
-                    }, 
-                    tags, 
-                    description: None, 
-                    reference: None
+                        None => open_editor(None)?,
+                    },
+                    tags,
+                    description: None,
+                    reference: None,
                 })?;
                 config.write()?;
             }
@@ -44,23 +49,21 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
                 let script = config.fetch_script(&alias)?;
                 println!("{}", script.command);
             }
-            CliSubcommand::List { list_aliases, tags } => {
-                match list_aliases {
-                    true => config.list_aliases(tags)?,
-                    false => config.list_scripts(tags)?
-                }
-            }
+            CliSubcommand::List { list_aliases, tags } => match list_aliases {
+                true => config.list_aliases(tags)?,
+                false => config.list_scripts(tags)?,
+            },
             CliSubcommand::Run { alias } => {
                 let arg = "";
                 let script = config.fetch_script(&alias)?;
-                script.run(cli.verbose, arg)?;
+                script.run(interpreter, cli.verbose, arg)?;
             }
         };
-    } else  {
+    } else {
         let arg = "";
         let alias = &cli.alias.expect("Alias is required unless subcommand.");
         let script = config.fetch_script(alias)?;
-        script.run(cli.verbose, arg)?;
+        script.run(interpreter, cli.verbose, arg)?;
     }
 
     Ok(())

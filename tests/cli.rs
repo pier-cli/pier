@@ -133,7 +133,7 @@ command = '''
         .stdout(contains("test_run_script_pipe_output"));
 });
 
-// Tests running a script which requires waiting for the process to end. 
+// Tests running a script which requires waiting for the process to end.
 pier_test!(cli => test_run_script_non_blocking, cfg => r#"
 [scripts.test_while_loop]
 alias = "test_while_loop"
@@ -172,4 +172,34 @@ command = '''
     cmd.assert()
         .success()
         .stderr(contains("WRITE THIS TO STDERR"));
+});
+
+// Tests that shebangs work.
+pier_test!(cli => test_run_with_shebang, cfg => r#"
+[scripts.test_shebang]
+alias = "test_shebang"
+command = '''
+#!/usr/bin/env python3
+print("Running python script with shebang!")
+'''
+"#, | _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["run", "test_shebang"]);
+    cmd.assert()
+        .success()
+        .stdout(contains("Running python script with shebang!"));
+});
+
+// Tests that default interpreter works
+pier_test!(cli => test_run_with_interpreter, cfg => r#"
+default_interpreter = ["python3", "-c"]
+[scripts.test_default_interpreter]
+alias = "test_default_interpreter"
+command = '''
+print("Running python script with interpreter!")
+'''
+"#, | _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["run", "test_default_interpreter"]);
+    cmd.assert()
+        .success()
+        .stdout(contains("Running python script with interpreter!"));
 });

@@ -94,6 +94,74 @@ SUBCOMMANDS:
 
 `pier list`, `pier add "ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up" --alias refresh-wifi`, `pier refresh-wifi`
 
+### Execute pier scripts in any interpreted languages
+Scripts starting with a shebang `#!` will be run with the specified interpeter just like it would in a normal script. Pier does this by creating a temp file from your script, executing it and then finally cleaning the file up. This allows you to write your pier script in python, node.js etc. even compiled languages can be run if using something like scriptisto.
+
+#### Shebang example config
+```
+
+[scripts.run_rust_script]
+alias = "run_rust_script"
+command = '''
+#!/usr/bin/env scriptisto
+
+// scriptisto-begin
+// script_src: src/main.rs
+// build_cmd: cargo build --release && strip ./target/release/script
+// target_bin: ./target/release/script
+// files:
+//  - path: Cargo.toml
+//    content: |
+//     package = { name = "script", version = "0.1.0", edition = "2018"}
+//     [dependencies]
+// scriptisto-end
+
+
+fn main() {
+    println!("This is a rust script!");
+}
+
+'''
+
+[scripts.run_python]
+alias = "run_python"
+command = '''
+#!/usr/bin/env python3
+import sys
+
+print("Running python with version {}".format(sys.version))
+
+'''
+```
+
+### Setting the default shell / interpreter
+By default if no shebang is specified pier will try to use your default shell to execute the script inline. This can be overwritten with the variable default_interpreter. It needs to be a list with the first item being the binary and the rest is any flags necessary.
+
+#### Default interpreter example config
+```
+# Sets the default interpreter, the first item in the list should be the binary and the rest are the arguments for the interpreter cli option.
+default_interpreter = ["node", "-e"]
+
+# Runs as the fallback interpreter nodejs as it's lacking a shebang
+[scripts.hello_world_nodejs]
+alias = "hello_world_nodejs"
+command = '''
+console.log("Hello world!")
+
+'''
+
+# This will be run as a posix sh script as it has a shebang
+[scripts.a_shell_script]
+alias = "a_shell_script"
+command = '''
+#!/bin/sh
+
+nohup st > /dev/null 2>&1&
+
+'''
+```
+
+
 ## Example `pier` TOML config
 
 ```
@@ -154,4 +222,3 @@ Originally intended as a way to manage Docker one-liners, the name `pier` contin
 ## Roadmap
 
 * Accept script arguments using Rust Command `.arg()` parameter
-* Allow listing using tags
