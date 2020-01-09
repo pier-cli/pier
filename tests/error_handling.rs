@@ -27,7 +27,7 @@ pier_test!(lib => test_error_no_scripts_exists, cfg => r#""#,
 // In this case the file is not created
 pier_test!(basic => test_config_read_error, | te: TestEnv | {
     let path = te.join_root("non_existant_file");
-    let lib = Config::from_input(Some(&path));
+    let lib = Config::from_input(Some(path));
     err_eq!(lib, ConfigRead);
 });
 
@@ -49,6 +49,6 @@ pier_test!(basic => test_toml_parse_error, | te: TestEnv| {
         "#)
     ).expect("Unable to write to file");
 
-    let lib = Config::from_file(cfg.path());
+    let lib = Config::from_file(cfg.path().to_path_buf());
     err_eq!(lib, TomlParse);
 });

@@ -28,3 +28,13 @@ macro_rules! home {
     };
 }
 
+///
+#[macro_export]
+macro_rules! clap_arg {
+    ($relative_path:expr) => {
+        match dirs::home_dir() {
+            Some(base) => Some(base.join($relative_path)),
+            None => None,
+        }
+    };
+}
