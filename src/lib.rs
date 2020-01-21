@@ -4,11 +4,16 @@ use snafu::{ensure, OptionExt, ResultExt};
 use std::collections::BTreeMap;
 use std::env;
 use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
+use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
+use std::process::Output;
 use std::process::Stdio;
 use structopt::{clap::AppSettings, StructOpt};
+use tempfile;
 use toml;
 pub mod error;
 mod macros;
@@ -24,6 +29,9 @@ pub struct Config {
     // Don't write anything to config if map is empty
     #[serde(default = "BTreeMap::new", skip_serializing_if = "BTreeMap::is_empty")]
     scripts: BTreeMap<String, Script>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_interpreter: Option<Vec<String>>,
 
     #[serde(skip)]
     pub verose: bool,
@@ -44,7 +52,6 @@ pub struct Script {
 #[derive(Debug, StructOpt)]
 pub enum CliSubcommand {
     /// Add a new script to config.
-
     Add {
         /// The command/script content to be executed.
         /// If this argument is not found it will open your $EDITOR for you to enter the script into.
@@ -124,12 +131,11 @@ pub struct Cli {
     pub path: Option<PathBuf>,
 
     /// The alias or name for the script.
-    #[structopt(required_unless="cmd")]
+    #[structopt(required_unless = "cmd")]
     pub alias: Option<String>,
 
-        
     /// Pier subcommands
-    #[structopt(subcommand)] 
+    #[structopt(subcommand)]
     pub cmd: Option<CliSubcommand>,
 }
 
@@ -149,6 +155,18 @@ impl Config {
     pub fn new() -> Config {
         Config::default()
     }
+    pub fn get_interpreter(&self) -> Vec<String> {
+        match self.default_interpreter.clone() {
+            Some(interpreter) => interpreter,
+            None => {
+                let shell = match env::var("SHELL") {
+                    Ok(default_shell) => default_shell,
+                    Err(_error) => String::from("/bin/sh")
+                };
+                vec![shell, String::from("-c")]
+            }
+        }
+    }
 
     /// Helper function to read file.
     fn read(path: &Path) -> Result<String> {
@@ -166,7 +184,8 @@ impl Config {
     /// Generate a new Config based on a file path.
     pub fn from_file(path: PathBuf) -> Result<Config> {
         let config_string = Config::read(&path)?;
-        let mut config: Config = toml::from_str(&config_string).context(TomlParse { path: &path })?;
+        let mut config: Config =
+            toml::from_str(&config_string).context(TomlParse { path: &path })?;
         config.path = path;
         Ok(config)
     }
@@ -232,7 +251,7 @@ impl Config {
             .context(AliasNotFound {
                 alias: &alias.to_string(),
             })?;
-        println!("Removed {}",  &alias);
+        println!("Removed {}", &alias);
         Ok(())
     }
 
@@ -300,34 +319,34 @@ impl Config {
     }
 }
 
+
 impl Script {
     /// Runs a script and print stdout and stderr of the command.
-    pub fn run(&self, verbose: bool, _arg: &str) -> Result<()> {
+    pub fn run(&self, default_interpreter: Vec<String>, verbose: bool, _arg: &str) -> Result<()> {
         if verbose {
             println!("Starting script \"{}\"", &self.alias);
             println!("-------------------------");
         };
 
-        let default_shell = env::var("SHELL").context(NoDefaultShell)?;
+        // Check that the script is not empty
+        if let Some(first_line) = self.command.lines().nth(0) {
+            // Check whether the script starts with a shebang.
+            let cmd = match first_line.starts_with("#!") {
+                true => self.run_with_shebang()?,
+                false => self.run_with_cli_interpreter(default_interpreter)?,
+            };
 
-        let cmd = Command::new(default_shell)
-            .args(&["-c", &self.command])
-            .stderr(Stdio::piped())
-            .spawn()
-            .context(CommandExec)?
-            .wait_with_output()
-            .context(CommandExec)?;
+            let stdout = String::from_utf8_lossy(&cmd.stdout);
+            let stderr = String::from_utf8_lossy(&cmd.stderr);
 
-        let stdout = String::from_utf8_lossy(&cmd.stdout);
-        let stderr = String::from_utf8_lossy(&cmd.stderr);
+            if stdout.len() > 0 {
+                println!("{}", stdout);
+            };
+            if stderr.len() > 0 {
+                eprintln!("{}", stderr);
+            };
 
-        if stdout.len() > 0 {
-            println!("{}", stdout);
         };
-        if stderr.len() > 0 {
-            eprintln!("{}", stderr);
-        };
-
 
         if verbose {
             println!("-------------------------");
@@ -335,5 +354,63 @@ impl Script {
         };
 
         Ok(())
+    }
+
+    /// Runs the script inline using something like sh -c "<script>" or python -c "<script."...
+    fn run_with_cli_interpreter(&self, interpreter: Vec<String>) -> Result<Output> {
+        // First item in interpreter is the binary
+        let cmd = Command::new(&interpreter[0])
+            // The following items after the binary is any commandline args that are necessary.
+            .args(&interpreter[1..])
+            .arg(&self.command)
+            .stderr(Stdio::piped())
+            .spawn()
+            .context(CommandExec)?
+            .wait_with_output()
+            .context(CommandExec)?;
+
+        Ok(cmd)
+    }
+
+    /// First creates a temporary file and then executes the file before removing it.
+    fn run_with_shebang(&self) -> Result<Output> {
+        // Creates a temp directory to place our tempfile inside.
+        let tmpdir = tempfile::Builder::new()
+            .prefix("pier")
+            .tempdir()
+            .context(ExecutableTempFileCreate)?;
+
+        let exec_file_path = tmpdir.path().join(&self.alias);
+
+        // Creating the file inside a closure is convenient because rust will automatically handle
+        // closing the file for us so we can go ahead and execute it after writing to it and setting the file permissions.
+        {
+            let mut exec_file = File::create(&exec_file_path).context(ExecutableTempFileCreate)?;
+
+            exec_file
+                .write(self.command.as_bytes())
+                .context(ExecutableTempFileCreate)?;
+
+            let mut permissions = exec_file
+                .metadata()
+                .context(ExecutableTempFileCreate)?
+                .permissions();
+
+            // Set the file permissions to allow read and execute for the current user.
+            permissions.set_mode(0o500);
+
+            exec_file
+                .set_permissions(permissions)
+                .context(ExecutableTempFileCreate)?;
+        }
+
+        let cmd = Command::new(exec_file_path)
+            .stderr(Stdio::piped())
+            .spawn()
+            .context(CommandExec)?
+            .wait_with_output()
+            .context(CommandExec)?;
+
+        Ok(cmd)
     }
 }

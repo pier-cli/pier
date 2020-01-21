@@ -16,7 +16,7 @@ macro_rules! err_eq {
 /// Creates a new test case for varying use cases
 ///
 /// # Examples
-/// 
+///
 /// ## Used for creating command line tests
 /// ```
 /// pier_test!(cli => r#"
@@ -75,7 +75,7 @@ macro_rules! pier_test {
 }
 
 /// Trims leading spaces on a raw string so you can properly indent it for nicer code overview.
-/// 
+///
 /// # Examples
 /// ```
 /// let trimmed = trim!(r#"
@@ -84,7 +84,7 @@ macro_rules! pier_test {
 ///     something something something
 /// "#);
 ///
-/// let untrimmed = 
+/// let untrimmed =
 /// r#"something something something
 /// something something something
 /// something something something"#;

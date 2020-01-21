@@ -45,4 +45,7 @@ pub enum PierError {
 
     #[snafu(display("error: EditorError: Failed when trying to get input from editor {}", source))]
     EditorError { source: scrawl::error::ScrawlError },
+
+    #[snafu(display("error: Failed when trying to create executable tempfile. {}", source))]
+    ExecutableTempFileCreate { source: std::io::Error },
 }

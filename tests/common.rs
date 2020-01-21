@@ -16,10 +16,7 @@ impl TestEnv {
         }
     }
     pub fn join_root(&self, rel_path: &str) -> PathBuf {
-        self.dir
-            .path()
-            .join(Path::new(rel_path))
-            .to_path_buf()
+        self.dir.path().join(Path::new(rel_path)).to_path_buf()
     }
     pub fn create_config(&mut self, path: &str, content: &str) -> ChildPath {
         let config_file = self.dir.child(path);
