@@ -257,6 +257,8 @@ impl Config {
 
     /// Adds a script that matches the alias
     pub fn add_script(&mut self, script: Script) -> Result<()> {
+	ensure!( ! &self.scripts.contains_key(&script.alias),
+		AliasAlreadyExists { alias: script.alias });
         println!("Added {}", &script.alias);
         self.scripts.insert(script.alias.to_string(), script);
         Ok(())
