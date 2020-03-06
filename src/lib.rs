@@ -21,6 +21,8 @@ use dirs;
 use error::*;
 use scrawl;
 
+const DEFAULT_COMMAND_DISPLAY_WIDTH: usize = 80;
+
 // Creates a Result type that return PierError by default
 pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
 
@@ -38,6 +40,9 @@ pub struct Config {
 
     #[serde(skip)]
     pub path: PathBuf,
+
+    #[serde(skip_serializing)]
+    pub command_display_width: Option<usize>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -85,15 +90,31 @@ pub enum CliSubcommand {
     Run {
         /// The alias or name for the script.
         alias: String,
-        //#[structopt(short = "a", long = "arg")]
-        //arg: String,
     },
     /// alias: ls - List scripts
+    ///
+    /// Display options are determined by priority in this order:
+    ///
+    /// 1. List only aliases
+    ///
+    /// 2. Show full command
+    ///
+    /// 3. Command display with (cli option)
+    ///
+    /// 4. Command display with (config option)
     #[structopt(alias = "ls")]
     List {
         /// Only displays aliases of the scripts.
         #[structopt(short = "q", long = "list_aliases")]
         list_aliases: bool,
+
+        /// Display the full command.
+        #[structopt(short = "l", long = "show_full_command")]
+        list_full_command: bool,
+
+        /// The max number of characters to display from the command.
+        #[structopt(short = "c", long = "command_display_width")]
+        command_display_width: Option<usize>,
 
         /// Filter based on tags.
         #[structopt(short = "t", long = "tag")]
@@ -161,11 +182,28 @@ impl Config {
             None => {
                 let shell = match env::var("SHELL") {
                     Ok(default_shell) => default_shell,
-                    Err(_error) => String::from("/bin/sh")
+                    Err(_error) => String::from("/bin/sh"),
                 };
                 vec![shell, String::from("-c")]
             }
         }
+    }
+
+    pub fn set_command_display_width(
+        mut self,
+        cli_command_display_width: Option<usize>,
+        cli_list_full_command: bool,
+    ) -> Self {
+        self.command_display_width = match cli_list_full_command {
+            true => None,
+            false => Some(
+                cli_command_display_width.unwrap_or(
+                    self.command_display_width
+                        .unwrap_or(DEFAULT_COMMAND_DISPLAY_WIDTH),
+                ),
+            ),
+        };
+        self
     }
 
     /// Helper function to read file.
@@ -297,17 +335,29 @@ impl Config {
                 (Some(list_tags), Some(script_tags)) => {
                     for tag in list_tags {
                         if script_tags.contains(tag) {
-                            table.add_row(row![&alias, script_tags.join(","), &script.command]);
+                            table.add_row(row![
+                                &alias,
+                                script_tags.join(","),
+                                script.display_command(self.command_display_width)
+                            ]);
                             continue;
                         }
                     }
                 }
                 (None, Some(script_tags)) => {
-                    table.add_row(row![&alias, script_tags.join(","), &script.command]);
+                    table.add_row(row![
+                        &alias,
+                        script_tags.join(","),
+                        script.display_command(self.command_display_width)
+                    ]);
                     continue;
                 }
                 (None, None) => {
-                    table.add_row(row![&alias, "", &script.command]);
+                    table.add_row(row![
+                        &alias,
+                        "",
+                        script.display_command(self.command_display_width)
+                    ]);
                     continue;
                 }
                 _ => (),
@@ -319,8 +369,20 @@ impl Config {
     }
 }
 
-
 impl Script {
+    fn display_command(&self, command_display_width: Option<usize>) -> &str {
+        match command_display_width {
+            None => &self.command,
+            Some(width) => match &self.command.lines().nth(0) {
+                Some(line) => match line.chars().count() {
+                    c if c < width => line,
+                    c if c > width => &line[0..width],
+                    _ => "",
+                },
+                None => &self.command,
+            },
+        }
+    }
     /// Runs a script and print stdout and stderr of the command.
     pub fn run(&self, default_interpreter: Vec<String>, verbose: bool, _arg: &str) -> Result<()> {
         if verbose {
@@ -345,7 +407,6 @@ impl Script {
             if stderr.len() > 0 {
                 eprintln!("{}", stderr);
             };
-
         };
 
         if verbose {

@@ -19,7 +19,9 @@ pier_test!(lib => test_error_no_scripts_exists, cfg => r#""#,
 | _cfg: ChildPath, mut lib: Config | {
     err_eq!(lib.remove_script(""), NoScriptsExists);
     err_eq!(lib.fetch_script(""), NoScriptsExists);
-    err_eq!(lib.list_scripts(None), NoScriptsExists);
+    err_eq!(lib
+        .set_command_display_width(None, true)
+        .list_scripts(None), NoScriptsExists);
 });
 
 // Tests that it returns the error ConfigRead if the file cannot be read.
@@ -39,7 +41,7 @@ pier_test!(basic => test_config_write_error, | _te: TestEnv | {
 
 // Tests that it returns the error TomlParse if the config is not valid Toml
 pier_test!(basic => test_toml_parse_error, | te: TestEnv| {
-    let cfg = te.dir.child("pier_config"); 
+    let cfg = te.dir.child("pier_config");
     cfg.touch().expect("Unable to create file");
     cfg.write_str(trim!(r#"
         [scripts.test_cmd_1]

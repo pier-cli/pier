@@ -35,7 +35,7 @@ Using **Nix** package manager:
 See `src/cli.yml` for a more detailed spec.
 
 ```
-pier 0.1.3
+pier 0.1.4
 Benjamin Scholtz, Isak Johansson
 A simple script management CLI
 
@@ -89,7 +89,6 @@ SUBCOMMANDS:
     remove    alias: rm - Remove a script matching alias.
     run       Run a script matching alias.
     show      Show a script matching alias.
-
 ```
 
 `pier list`, `pier add "ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up" --alias refresh-wifi`, `pier refresh-wifi`

@@ -49,9 +49,16 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
                 let script = config.fetch_script(&alias)?;
                 println!("{}", script.command);
             }
-            CliSubcommand::List { list_aliases, tags } => match list_aliases {
+            CliSubcommand::List {
+                list_aliases,
+                tags,
+                list_full_command,
+                command_display_width,
+            } => match list_aliases {
                 true => config.list_aliases(tags)?,
-                false => config.list_scripts(tags)?,
+                false => config
+                    .set_command_display_width(command_display_width, list_full_command)
+                    .list_scripts(tags)?,
             },
             CliSubcommand::Run { alias } => {
                 let arg = "";

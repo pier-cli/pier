@@ -26,6 +26,24 @@ pier_test!(cli => test_list_scripts, cfg => CONFIG_1,
         .success();
 });
 
+// Tests listing alias
+pier_test!(cli => test_list_alias_scripts, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    // TODO Add some way to verify the output other than exit code.
+    cmd.arg("ls");
+    cmd.assert()
+        .success();
+});
+
+// Tests listing all scripts
+pier_test!(cli => test_list_scripts_with_command_width, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    // TODO Add some way to verify the output other than exit code.
+    cmd.args(&["list", "-c", "20"]);
+    cmd.assert()
+        .success();
+});
+
 // Tests listing all aliases
 pier_test!(cli => test_list_aliases, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
