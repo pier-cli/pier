@@ -209,7 +209,9 @@ print("Running python script with shebang!")
 
 // Tests that default interpreter works
 pier_test!(cli => test_run_with_interpreter, cfg => r#"
-default_interpreter = ["python3", "-c"]
+[default]
+interpreter = ["python3", "-c"]
+
 [scripts.test_default_interpreter]
 alias = "test_default_interpreter"
 command = '''
