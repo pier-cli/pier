@@ -109,6 +109,8 @@ impl Pier {
 
     /// Adds a script that matches the alias
     pub fn add_script(&mut self, script: Script) -> Result<()> {
+	ensure!( ! &self.config.scripts.contains_key(&script.alias),
+		AliasAlreadyExists { alias: script.alias });
         println!("Added {}", &script.alias);
 
         self.config.scripts.insert(script.alias.to_string(), script);

@@ -31,6 +31,9 @@ pub enum PierError {
     #[snafu(display("error: AliasNotFound: No script found by alias {}", alias))]
     AliasNotFound { alias: String },
 
+    #[snafu(display("error: AliasAlreadyExists:  {}", alias))]
+    AliasAlreadyExists { alias: String },
+
     #[snafu(display("error: No scripts exist. Would you like to add a new script?"))]
     NoScriptsExists,
 
