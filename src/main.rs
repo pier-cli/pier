@@ -66,15 +66,14 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
                     pier.list_scripts(tags, cmd_full, cmd_width)?
                 }
             }
-            CliSubcommand::Run { alias } => {
-                let arg = "";
-                pier.run_script(&alias, arg)?;
+            CliSubcommand::Run { alias, args } => {
+                let args = if let Some(a) = args {a} else {vec![]};
+                pier.run_script(&alias, &args)?;
             }
         };
     } else {
-        let arg = "";
-        let alias = &cli.alias.expect("Alias is required unless subcommand.");
-        pier.run_script(alias, arg)?;
+        let alias = cli.alias_and_args;
+        pier.run_script(&alias.get(0).expect("Alias is required unless subcommand."), &alias[1..])?;
     }
 
     Ok(())
