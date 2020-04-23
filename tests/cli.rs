@@ -15,6 +15,19 @@ tags = ['info', 'echo', 'grp_1']
 alias = 'test_cmd_2'
 command = 'echo test_2' 
 tags = ['debug', 'echo']
+
+[scripts.test_success]
+alias = 'test_success'
+command = 'exit 0' 
+
+[scripts.test_fail]
+alias = 'test_fail'
+command = 'exit 1' 
+
+[scripts.test_exit_with_100]
+alias = 'test_exit_with_100'
+command = 'exit 100' 
+
 "#;
 
 // Tests listing all scripts
@@ -33,6 +46,31 @@ pier_test!(cli => test_list_alias_scripts, cfg => CONFIG_1,
     cmd.arg("ls");
     cmd.assert()
         .success();
+});
+
+// Tests script with successful exit code
+pier_test!(cli => test_run_successful, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["run", "test_success"]);
+    cmd.assert()
+        .success();
+});
+
+// Tests script with failing exit code
+pier_test!(cli => test_run_failing, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["run", "test_fail"]);
+    cmd.assert()
+        .failure();
+});
+
+// Tests script with custom exit code
+pier_test!(cli => test_run_custom_exit_code, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["run", "test_exit_with_100"]);
+    cmd.assert()
+        .failure()
+	.code(100);
 });
 
 // Tests listing all scripts

@@ -1,6 +1,6 @@
 use prettytable::{cell, format, row, Table};
 use snafu::{ensure, OptionExt, ResultExt};
-use std::{path::PathBuf};
+use std::{path::PathBuf, process::ExitStatus};
 pub mod cli;
 mod config;
 pub mod error;
@@ -202,7 +202,7 @@ impl Pier {
     }
 
     /// Runs a script and print stdout and stderr of the command.
-    pub fn run_script(&self, alias: &str, _arg: &str) -> Result<()> {
+    pub fn run_script(&self, alias: &str, _arg: &str) -> Result<ExitStatus> {
         let script = self.fetch_script(alias)?;
         let interpreter = match self.config.default.interpreter {
             Some(ref interpreter) => interpreter.clone(),
@@ -234,7 +234,7 @@ impl Pier {
             println!("Script complete");
         };
 
-        Ok(())
+        Ok(cmd.status)
     }
 }
 

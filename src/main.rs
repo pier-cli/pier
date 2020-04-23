@@ -11,15 +11,24 @@ use pier::{
 fn main() {
     let opt = Cli::from_args();
 
-    if let Err(err) = handle_subcommands(opt) {
-        eprintln!("{}", err);
-        // Only exits the process once the used memory has been cleaned up.
-        process::exit(1);
-    }
+    match handle_subcommands(opt) {
+        Ok(status) => {
+            if let Some(status) = status {
+                let code = status.code().unwrap_or(0);
+                process::exit(code)
+            } else {
+                process::exit(0)
+            }
+        }
+        Err(err) => {
+            eprintln!("{}", err);
+            process::exit(1);
+        }
+    };
 }
 
 /// Handles the commandline subcommands
-fn handle_subcommands(cli: Cli) -> Result<()> {
+fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
     let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
     //let interpreter = config.get_interpreter();
     if let Some(subcmd) = cli.cmd {
@@ -68,14 +77,16 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
             }
             CliSubcommand::Run { alias } => {
                 let arg = "";
-                pier.run_script(&alias, arg)?;
+                let exit_code = pier.run_script(&alias, arg)?;
+                return Ok(Some(exit_code));
             }
         };
     } else {
         let arg = "";
         let alias = &cli.alias.expect("Alias is required unless subcommand.");
-        pier.run_script(alias, arg)?;
+        let exit_code = pier.run_script(alias, arg)?;
+        return Ok(Some(exit_code));
     }
 
-    Ok(())
+    Ok(None)
 }
