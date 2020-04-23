@@ -82,16 +82,18 @@ pier_test!(cli => test_list_without_tag_match, cfg => CONFIG_1,
 // Tests adding a script
 pier_test!(cli => test_add_script, cfg => CONFIG_1,
 | cfg: ChildPath, mut cmd: Command | {
-    cmd.args(&["add", r#"echo test_3"#, "-a", "test_cmd_3"]);
+    cmd.args(&["add", r#"echo test_3"#, "-a", "test_cmd_3", "-d", "Test Description."]);
     cmd.assert().success();
 
     cfg.assert(contains(trim!(r#"
         [scripts.test_cmd_3]
         alias = 'test_cmd_3'
-        command = 'echo test_3' 
+        command = 'echo test_3'
+        description = 'Test Description.'
     "#)).trim()
     );
 });
+
 
 // Tests removing a script
 pier_test!(cli => test_remove_script, cfg => CONFIG_1,
