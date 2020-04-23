@@ -5,7 +5,7 @@ pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-mod macros;
+pub mod macros;
 mod defaults;
 use defaults::*;
 pub mod script;

@@ -98,14 +98,13 @@ pub struct CliOpts {
 }
 
 #[derive(Debug, StructOpt)]
-#[structopt(setting = AppSettings::SubcommandsNegateReqs, author)]
+#[structopt(setting = AppSettings::SubcommandsNegateReqs, setting = AppSettings::ArgRequiredElseHelp, author)]
 /// A simple script management CLI
 pub struct Cli {
     #[structopt(flatten)]
     pub opts: CliOpts,
 
     /// The alias or name for the script.
-    #[structopt(required_unless = "cmd")]
     pub alias: Option<String>,
 
     /// Pier subcommands

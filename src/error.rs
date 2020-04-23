@@ -28,6 +28,9 @@ pub enum PierError {
         source: std::io::Error,
         path: PathBuf,
     },
+    #[snafu(display("error: AliasOrSubcommandRequired: No alias or subcommand supplied."))]
+    AliasOrSubcommandRequired,
+
     #[snafu(display("error: AliasNotFound: No script found by alias {}", alias))]
     AliasNotFound { alias: String },
 
