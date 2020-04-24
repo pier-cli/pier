@@ -13,6 +13,10 @@ pub enum CliSubcommand {
         #[structopt(short = "a", long = "alias")]
         alias: String,
 
+        /// The description for the script.
+        #[structopt(short = "d", long = "--description")]
+        description: Option<String>,
+
         /// Set which tags the script belongs to.
         #[structopt(short = "t", long = "tag")]
         tags: Option<Vec<String>>,

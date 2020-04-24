@@ -27,16 +27,17 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
             CliSubcommand::Add {
                 command,
                 alias,
+                description,
                 tags,
             } => {
                 pier.add_script(Script {
                     alias,
+                    description,
                     command: match command {
                         Some(cmd) => cmd,
                         None => open_editor(None)?,
                     },
                     tags,
-                    description: None,
                     reference: None,
                 })?;
                 pier.write()?;
