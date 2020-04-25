@@ -35,11 +35,11 @@ Using **Nix** package manager:
 
 #### Version `0.1.4`:
 The configuration variable `default_interpreter` has been _**removed**_:
-```
+```toml
 default_interpreter = ["foorunner", "-c"]
 ```
 So when upgrading from to `0.1.4` from an earlier version you will need to instead specify the variable in this format:
-```
+```toml
 [default]
 interpreter = ["foorunner", "-c"]
 ```
@@ -108,7 +108,7 @@ SUBCOMMANDS:
 
 ## Example `pier` TOML config
 
-```
+```toml
 [scripts.refresh-wifi]
 alias = "refresh-wifi"
 command = "ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up"
