@@ -17,6 +17,9 @@ edition = "2018"
 
 autotests = false
 
+[build-dependencies]
+structopt = "0.3"
+
 [dependencies]
 toml = "0.4"
 serde = { version = '1.0.83', features = ['derive'] }

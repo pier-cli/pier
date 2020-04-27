@@ -1,16 +1,19 @@
+use snafu::ensure;
 use std::process;
+use structopt::clap::Shell;
 use structopt::StructOpt;
 
 use pier::{
     cli::{Cli, CliSubcommand},
-    open_editor,
+    error::*,
+    open_editor, pier_err,
     script::Script,
     Pier, Result,
 };
 
 fn main() {
     let opt = Cli::from_args();
-
+    //Cli::clap().gen_completions(env!("CARGO_PKG_NAME"), Shell::Zsh, "target");
     if let Err(err) = handle_subcommands(opt) {
         eprintln!("{}", err);
         // Only exits the process once the used memory has been cleaned up.
@@ -74,8 +77,10 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
         };
     } else {
         let arg = "";
-        let alias = &cli.alias.expect("Alias is required unless subcommand.");
-        pier.run_script(alias, arg)?;
+        match &cli.alias {
+            Some(alias) => pier.run_script(&alias, arg)?,
+            None => pier_err!(PierError::AliasOrSubcommandRequired),
+        }
     }
 
     Ok(())
