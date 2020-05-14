@@ -20,7 +20,7 @@ fn main() {
 
 /// Handles the commandline subcommands
 fn handle_subcommands(cli: Cli) -> Result<()> {
-    let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
+    // let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
     //let interpreter = config.get_interpreter();
     if let Some(subcmd) = cli.cmd {
         match subcmd {
@@ -30,6 +30,7 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
                 description,
                 tags,
             } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.add_script(Script {
                     alias,
                     description,
@@ -44,14 +45,20 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
             }
 
             CliSubcommand::Edit { alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.edit_script(&alias)?;
                 pier.write()?;
             }
             CliSubcommand::Remove { alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.remove_script(&alias)?;
                 pier.write()?;
             }
+            CliSubcommand::ConfigInit => {
+                Pier::config_init()?;
+            }
             CliSubcommand::Show { alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 let script = pier.fetch_script(&alias)?;
                 println!("{}", script.command);
             }
@@ -61,6 +68,7 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
                 cmd_full,
                 cmd_width,
             } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 if list_aliases {
                     pier.list_aliases(tags)?
                 } else {
@@ -68,6 +76,7 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
                 }
             }
             CliSubcommand::Run { alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 let arg = "";
                 pier.run_script(&alias, arg)?;
             }
@@ -75,8 +84,10 @@ fn handle_subcommands(cli: Cli) -> Result<()> {
     } else {
         let arg = "";
         let alias = &cli.alias.expect("Alias is required unless subcommand.");
+        let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
         pier.run_script(alias, arg)?;
     }
+
 
     Ok(())
 }
