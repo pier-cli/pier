@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
-use super::Result;
 use super::error::*;
 use super::script::Script;
-use snafu::{ResultExt};
+use super::Result;
+use serde::{Deserialize, Serialize};
+use snafu::ResultExt;
 use std::{collections::BTreeMap, fs, path::PathBuf};
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -15,7 +15,6 @@ pub struct ConfigDefaultOpts {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub command_width: Option<usize>,
 }
-    
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
@@ -24,7 +23,7 @@ pub struct Config {
     pub scripts: BTreeMap<String, Script>,
 
     #[serde(default)]
-    pub default: ConfigDefaultOpts
+    pub default: ConfigDefaultOpts,
 }
 
 impl Config {

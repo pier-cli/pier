@@ -70,7 +70,7 @@ pier_test!(cli => test_run_custom_exit_code, cfg => CONFIG_1,
     cmd.args(&["run", "test_exit_with_100"]);
     cmd.assert()
         .failure()
-	.code(100);
+    .code(100);
 });
 
 // Tests listing all scripts
@@ -131,7 +131,6 @@ pier_test!(cli => test_add_script, cfg => CONFIG_1,
     "#)).trim()
     );
 });
-
 
 // Tests removing a script
 pier_test!(cli => test_remove_script, cfg => CONFIG_1,

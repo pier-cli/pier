@@ -1,7 +1,7 @@
 use crate::common::TestEnv;
 use assert_fs::fixture::ChildPath;
 use assert_fs::prelude::*;
-use pier::{Pier, error::*, script::Script};
+use pier::{error::*, script::Script, Pier};
 
 // Tests that it returns the error AliasNotFound if the alias given does not exist
 pier_test!(lib => test_error_alias_not_found, cfg => r#"
@@ -28,11 +28,11 @@ alias = 'test_cmd_1'
 command = 'echo test_1' 
 "#, | _cfg: ChildPath, mut lib: Pier | {
     let script = Script {
-	alias: "test_cmd_1".to_string(),
-	command: "echo something else".to_string(),
-	description: None,
-	reference: None,
-	tags: None
+    alias: "test_cmd_1".to_string(),
+    command: "echo something else".to_string(),
+    description: None,
+    reference: None,
+    tags: None
     };
     err_eq!(lib.add_script(script), AliasAlreadyExists);
 });

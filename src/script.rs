@@ -1,12 +1,12 @@
-use serde::{Deserialize, Serialize};
-use super::Result;
 use super::error::*;
-use std::io::prelude::*;
-use tempfile;
+use super::Result;
+use serde::{Deserialize, Serialize};
+use snafu::ResultExt;
 use std::fs::File;
-use snafu::{ResultExt};
-use std::process::{Command, Output, Stdio};
+use std::io::prelude::*;
 use std::os::unix::fs::PermissionsExt;
+use std::process::{Command, Output, Stdio};
+use tempfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Script {
@@ -19,10 +19,10 @@ pub struct Script {
 
 impl Script {
     pub fn has_shebang(&self) -> bool {
-	match self.command.lines().nth(0) {
+        match self.command.lines().nth(0) {
             Some(line) => line.starts_with("#!"),
-	    None => false
-	}
+            None => false,
+        }
     }
     pub fn display_command(&self, display_full: bool, width: usize) -> &str {
         match display_full {

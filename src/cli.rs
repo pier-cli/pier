@@ -1,5 +1,5 @@
-use structopt::{clap::AppSettings, StructOpt};
 use std::path::PathBuf;
+use structopt::{clap::AppSettings, StructOpt};
 
 #[derive(Debug, StructOpt)]
 pub enum CliSubcommand {

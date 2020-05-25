@@ -1,4 +1,4 @@
-use super::{xdg_config_home, home, pier_err, Result, PierError};
+use super::{home, pier_err, xdg_config_home, PierError, Result};
 use dirs;
 use std::{env, path::PathBuf};
 pub const FALLBACK_COMMAND_DISPLAY_WIDTH: usize = 80;

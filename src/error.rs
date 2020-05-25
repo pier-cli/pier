@@ -1,7 +1,7 @@
 use enum_kinds::EnumKind;
+use scrawl;
 use snafu::Snafu;
 use std::path::PathBuf;
-use scrawl;
 
 #[derive(Snafu, Debug, EnumKind)]
 #[enum_kind(PierErrorKind)]
@@ -46,7 +46,10 @@ pub enum PierError {
     #[snafu(display("error: No default config file found. See help for more info."))]
     NoConfigFile,
 
-    #[snafu(display("error: EditorError: Failed when trying to get input from editor {}", source))]
+    #[snafu(display(
+        "error: EditorError: Failed when trying to get input from editor {}",
+        source
+    ))]
     EditorError { source: scrawl::error::ScrawlError },
 
     #[snafu(display("error: Failed when trying to create executable tempfile. {}", source))]

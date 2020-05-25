@@ -5,13 +5,13 @@ pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-mod macros;
 mod defaults;
+mod macros;
 use defaults::*;
 pub mod script;
-use script::Script;
 use error::*;
 use scrawl;
+use script::Script;
 
 // Creates a Result type that return PierError by default
 pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
@@ -109,8 +109,12 @@ impl Pier {
 
     /// Adds a script that matches the alias
     pub fn add_script(&mut self, script: Script) -> Result<()> {
-	ensure!( ! &self.config.scripts.contains_key(&script.alias),
-		AliasAlreadyExists { alias: script.alias });
+        ensure!(
+            !&self.config.scripts.contains_key(&script.alias),
+            AliasAlreadyExists {
+                alias: script.alias
+            }
+        );
         println!("Added {}", &script.alias);
 
         self.config.scripts.insert(script.alias.to_string(), script);
