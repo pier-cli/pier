@@ -206,7 +206,7 @@ impl Pier {
     }
 
     /// Runs a script and print stdout and stderr of the command.
-    pub fn run_script(&self, alias: &str, _arg: &str) -> Result<ExitStatus> {
+    pub fn run_script(&self, alias: &str, args: Vec<String>) -> Result<ExitStatus> {
         let script = self.fetch_script(alias)?;
         let interpreter = match self.config.default.interpreter {
             Some(ref interpreter) => interpreter.clone(),
@@ -219,8 +219,8 @@ impl Pier {
         };
 
         let cmd = match script.has_shebang() {
-            true => script.run_with_shebang()?,
-            false => script.run_with_cli_interpreter(&interpreter)?,
+            true => script.run_with_shebang(args)?,
+            false => script.run_with_cli_interpreter(&interpreter, args)?,
         };
 
         let stdout = String::from_utf8_lossy(&cmd.stdout);
