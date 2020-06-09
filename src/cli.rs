@@ -41,6 +41,8 @@ pub enum CliSubcommand {
     Run {
         /// The alias or name for the script.
         alias: String,
+	/// The positional arguments to send to script.
+	args: Vec<String>
     },
     /// alias: ls - List scripts
     ///
@@ -102,7 +104,7 @@ pub struct CliOpts {
 }
 
 #[derive(Debug, StructOpt)]
-#[structopt(setting = AppSettings::SubcommandsNegateReqs, author)]
+#[structopt(setting = AppSettings::SubcommandsNegateReqs, setting = AppSettings::TrailingVarArg, author)]
 /// A simple script management CLI
 pub struct Cli {
     #[structopt(flatten)]
@@ -111,6 +113,9 @@ pub struct Cli {
     /// The alias or name for the script.
     #[structopt(required_unless = "cmd")]
     pub alias: Option<String>,
+
+    /// The positional arguments to send to script.
+    pub args: Vec<String>,
 
     /// Pier subcommands
     #[structopt(subcommand)]

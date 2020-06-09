@@ -76,16 +76,14 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                     pier.list_scripts(tags, cmd_full, cmd_width)?
                 }
             }
-            CliSubcommand::Run { alias } => {
-                let arg = "";
-                let exit_code = pier.run_script(&alias, arg)?;
+            CliSubcommand::Run { alias, args } => {
+                let exit_code = pier.run_script(&alias, args)?;
                 return Ok(Some(exit_code));
             }
         };
     } else {
-        let arg = "";
         let alias = &cli.alias.expect("Alias is required unless subcommand.");
-        let exit_code = pier.run_script(alias, arg)?;
+        let exit_code = pier.run_script(alias, cli.args)?;
         return Ok(Some(exit_code));
     }
 

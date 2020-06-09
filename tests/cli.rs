@@ -28,6 +28,19 @@ command = 'exit 1'
 alias = 'test_exit_with_100'
 command = 'exit 100' 
 
+[scripts.shebang-with-args]
+alias = 'shebang-with-args'
+command = '''
+#!/bin/sh
+echo "$1--$2"
+''' 
+
+[scripts.inline-with-args]
+alias = 'inline-with-args'
+command = '''
+echo "$1--$2"
+'''
+
 "#;
 
 // Tests listing all scripts
@@ -40,6 +53,32 @@ pier_test!(cli => test_list_scripts, cfg => CONFIG_1,
 });
 
 // Tests listing alias
+pier_test!(cli => test_run_shebang_with_args, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.arg("run")
+	.arg("shebang-with-args")
+	.arg("Hello!")
+	.arg("Hi.");
+
+    cmd.assert()
+        .stdout(contains("Hello!--Hi."))
+        .success();
+});
+
+pier_test!(cli => test_run_inline_with_args, cfg => CONFIG_1,
+| _cfg: ChildPath, mut cmd: Command | {
+    cmd.arg("run")
+	.arg("inline-with-args")
+	.arg("Hello!")
+	.arg("Hi.");
+
+    cmd.assert()
+        .stdout(contains("Hello!--Hi."))
+        .success();
+});
+
+
+// Tests script with arguments.
 pier_test!(cli => test_list_alias_scripts, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
     // TODO Add some way to verify the output other than exit code.

@@ -38,12 +38,14 @@ impl Script {
         }
     }
     /// Runs the script inline using something like sh -c "<script>" or python -c "<script."...
-    pub fn run_with_cli_interpreter(&self, interpreter: &Vec<String>) -> Result<Output> {
+    pub fn run_with_cli_interpreter(&self, interpreter: &Vec<String>, args: Vec<String>) -> Result<Output> {
         // First item in interpreter is the binary
         let cmd = Command::new(&interpreter[0])
             // The following items after the binary is any commandline args that are necessary.
             .args(&interpreter[1..])
             .arg(&self.command)
+	    .arg(&self.alias)
+	    .args(&args)
             .stderr(Stdio::piped())
             .spawn()
             .context(CommandExec)?
@@ -54,7 +56,7 @@ impl Script {
     }
 
     /// First creates a temporary file and then executes the file before removing it.
-    pub fn run_with_shebang(&self) -> Result<Output> {
+    pub fn run_with_shebang(&self, args: Vec<String>) -> Result<Output> {
         // Creates a temp directory to place our tempfile inside.
         let tmpdir = tempfile::Builder::new()
             .prefix("pier")
@@ -87,6 +89,7 @@ impl Script {
 
         let cmd = Command::new(exec_file_path)
             .stderr(Stdio::piped())
+	    .args(&args)
             .spawn()
             .context(CommandExec)?
             .wait_with_output()
