@@ -42,11 +42,11 @@ impl Pier {
             Err(err) => match err.kind() {
                 AlreadyExists => (),
                 _ => Err(err).context(CreateDirectory)?,
-            }
+            },
         };
         let mut pier = Self::new();
         pier.path = config_dir.join("config.toml");
-        pier.add_script(Script{
+        pier.add_script(Script {
             alias: String::from("hello-pier"),
             command: String::from("echo Hello, Pier!"),
             description: Some(String::from("This is an example command.")),

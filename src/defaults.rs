@@ -1,10 +1,9 @@
 use super::{home, pier_err, xdg_config_home, PierError, Result};
 use dirs;
-use std::{env, path::PathBuf};
 use snafu::OptionExt;
+use std::{env, path::PathBuf};
 pub const FALLBACK_COMMAND_DISPLAY_WIDTH: usize = 80;
 pub const FALLBACK_SHELL: &'static str = "/bin/sh";
-
 
 pub fn fallback_shell() -> Vec<String> {
     match env::var("SHELL") {
