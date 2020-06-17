@@ -54,4 +54,7 @@ pub enum PierError {
 
     #[snafu(display("error: Failed when trying to create executable tempfile. {}", source))]
     ExecutableTempFileCreate { source: std::io::Error },
+
+    #[snafu(display("error: Failed to create directory. {}", source))]
+    CreateDirectory { source: std::io::Error },
 }

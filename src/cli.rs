@@ -27,6 +27,9 @@ pub enum CliSubcommand {
         /// The alias or name for the script.
         alias: String,
     },
+    /// alias: init - Add a config file.
+    #[structopt(alias = "init")]
+    ConfigInit,
     /// Edit a script matching alias.
     Edit {
         /// The alias or name for the script.

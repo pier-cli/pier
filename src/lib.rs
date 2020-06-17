@@ -1,6 +1,8 @@
 use prettytable::{cell, format, row, Table};
 use snafu::{ensure, OptionExt, ResultExt};
 use std::{path::PathBuf, process::ExitStatus};
+use std::fs;
+use std::fs::File;
 pub mod cli;
 mod config;
 pub mod error;
@@ -12,6 +14,7 @@ pub mod script;
 use error::*;
 use scrawl;
 use script::Script;
+use std::io::ErrorKind;
 
 // Creates a Result type that return PierError by default
 pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
@@ -29,6 +32,29 @@ impl Pier {
     pub fn write(&self) -> Result<()> {
         self.config.write(&self.path)?;
 
+        Ok(())
+    }
+
+    pub fn config_init() -> Result<()> {
+        let config_dir = xdg_config_home!("pier").unwrap();
+        match fs::create_dir(dbg!(xdg_config_home!("pier")).unwrap()) {
+            Ok(_) => (),
+            Err(err) => match err.kind() {
+                AlreadyExists => (),
+                _ => Err(err).context(CreateDirectory)?,
+            }
+        };
+        let mut pier = Self::new();
+        pier.path = config_dir.join("config.toml");
+        pier.add_script(Script{
+            alias: String::from("hello-pier"),
+            command: String::from("echo Hello, Pier!"),
+            description: Some(String::from("This is an example command.")),
+            reference: None,
+            tags: None,
+        });
+        let mut file = File::create(&pier.path);
+        pier.write()?;
         Ok(())
     }
 
