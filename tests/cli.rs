@@ -8,32 +8,32 @@ use std::process::Command;
 const CONFIG_1: &'static str = r#"
 [scripts.test_cmd_1]
 alias = 'test_cmd_1'
-command = 'echo test_1' 
+command = 'echo test_1'
 tags = ['info', 'echo', 'grp_1']
 
 [scripts.test_cmd_2]
 alias = 'test_cmd_2'
-command = 'echo test_2' 
+command = 'echo test_2'
 tags = ['debug', 'echo']
 
 [scripts.test_success]
 alias = 'test_success'
-command = 'exit 0' 
+command = 'exit 0'
 
 [scripts.test_fail]
 alias = 'test_fail'
-command = 'exit 1' 
+command = 'exit 1'
 
 [scripts.test_exit_with_100]
 alias = 'test_exit_with_100'
-command = 'exit 100' 
+command = 'exit 100'
 
 [scripts.shebang-with-args]
 alias = 'shebang-with-args'
 command = '''
 #!/bin/sh
 echo "$1--$2"
-''' 
+'''
 
 [scripts.inline-with-args]
 alias = 'inline-with-args'
@@ -146,6 +146,15 @@ pier_test!(cli => test_list_alias_with_matching_tag, cfg => CONFIG_1,
     );
 });
 
+// WORK IN PROGRESS
+pier_test!(cli => test_config_initialization, cfg => "",
+| cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["init"]);
+    cmd.assert()
+        .success();
+        cfg.assert(predicate::path::exists());
+});
+
 // Tests that no aliases is listed when no tag is matched
 pier_test!(cli => test_list_without_tag_match, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
@@ -179,7 +188,7 @@ pier_test!(cli => test_remove_script, cfg => CONFIG_1,
     cfg.assert(contains(trim!(r#"
         [scripts.test_cmd_1]
         alias = 'test_cmd_1'
-        command = 'echo test_1' 
+        command = 'echo test_1'
         "#)).trim().not()
     );
 

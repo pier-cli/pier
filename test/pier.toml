@@ -1,0 +1,6 @@
+[scripts.hello-pier]
+alias = 'hello-pier'
+command = 'echo Hello, Pier!'
+description = 'This is an example command.'
+
+[default]

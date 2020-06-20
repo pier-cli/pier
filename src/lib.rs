@@ -7,14 +7,13 @@ pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-mod defaults;
+pub mod defaults;
 mod macros;
 use defaults::*;
 pub mod script;
 use error::*;
 use scrawl;
 use script::Script;
-use std::io::ErrorKind;
 
 // Creates a Result type that return PierError by default
 pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
@@ -23,7 +22,7 @@ pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
 #[derive(Debug, Default)]
 pub struct Pier {
     config: Config,
-    path: PathBuf,
+    pub path: PathBuf,
     verbose: bool,
 }
 
@@ -35,26 +34,28 @@ impl Pier {
         Ok(())
     }
 
-    pub fn config_init() -> Result<()> {
-        let config_dir = xdg_config_home!("pier").unwrap();
-        match fs::create_dir(dbg!(xdg_config_home!("pier")).unwrap()) {
-            Ok(_) => (),
-            Err(err) => match err.kind() {
-                AlreadyExists => (),
-                _ => Err(err).context(CreateDirectory)?,
-            },
+    pub fn config_init(&mut self) -> Result<()> {
+
+        if let Some(parent_dir) = &self.path.parent() {
+            if ! parent_dir.exists() {
+                fs::create_dir(parent_dir).context(CreateDirectory)?;
+            }
         };
-        let mut pier = Self::new();
-        pier.path = config_dir.join("config.toml");
-        pier.add_script(Script {
+
+        File::create(&self.path).context(ConfigWrite{
+            path: &self.path
+        })?;
+
+        &self.add_script(Script {
             alias: String::from("hello-pier"),
             command: String::from("echo Hello, Pier!"),
             description: Some(String::from("This is an example command.")),
             reference: None,
             tags: None,
         });
-        let mut file = File::create(&pier.path);
-        pier.write()?;
+
+        self.write()?;
+
         Ok(())
     }
 
