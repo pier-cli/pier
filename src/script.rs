@@ -5,7 +5,7 @@ use snafu::ResultExt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::os::unix::fs::PermissionsExt;
-use std::process::{Command, Output, Stdio};
+use std::process::{Command, Output};
 use tempfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -38,15 +38,18 @@ impl Script {
         }
     }
     /// Runs the script inline using something like sh -c "<script>" or python -c "<script."...
-    pub fn run_with_cli_interpreter(&self, interpreter: &Vec<String>, args: Vec<String>) -> Result<Output> {
+    pub fn run_with_cli_interpreter(
+        &self,
+        interpreter: &Vec<String>,
+        args: Vec<String>,
+    ) -> Result<Output> {
         // First item in interpreter is the binary
         let cmd = Command::new(&interpreter[0])
             // The following items after the binary is any commandline args that are necessary.
             .args(&interpreter[1..])
             .arg(&self.command)
-	    .arg(&self.alias)
-	    .args(&args)
-            .stderr(Stdio::piped())
+            .arg(&self.alias)
+            .args(&args)
             .spawn()
             .context(CommandExec)?
             .wait_with_output()
@@ -88,8 +91,7 @@ impl Script {
         }
 
         let cmd = Command::new(exec_file_path)
-            .stderr(Stdio::piped())
-	    .args(&args)
+            .args(&args)
             .spawn()
             .context(CommandExec)?
             .wait_with_output()
