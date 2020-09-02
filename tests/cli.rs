@@ -18,15 +18,24 @@ tags = ['debug', 'echo']
 
 [scripts.test_success]
 alias = 'test_success'
-command = 'exit 0' 
+command = '''
+#!/bin/sh
+exit 0
+'''
 
 [scripts.test_fail]
 alias = 'test_fail'
-command = 'exit 1' 
+command = '''
+#!/bin/sh
+exit 1
+'''
 
 [scripts.test_exit_with_100]
 alias = 'test_exit_with_100'
-command = 'exit 100' 
+command = '''
+#!/bin/sh
+exit 100
+'''
 
 [scripts.shebang-with-args]
 alias = 'shebang-with-args'
@@ -37,9 +46,7 @@ echo "$1--$2"
 
 [scripts.inline-with-args]
 alias = 'inline-with-args'
-command = '''
-echo "$1--$2"
-'''
+command = 'echo "$1--$2"'
 
 "#;
 
@@ -69,6 +76,7 @@ pier_test!(cli => test_run_inline_with_args, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
     cmd.arg("run")
 	.arg("inline-with-args")
+	.env("SHELL", "/bin/sh")
 	.arg("Hello!")
 	.arg("Hi.");
 
@@ -190,8 +198,9 @@ pier_test!(cli => test_show_script, cfg => r#"
 [scripts.test_show]
 alias = 'test_show'
 command = '''
+#!/bin/sh
 for line in l1 l2 l3 l4; do
-    echo "$line"
+echo "$line"
 done
 '''
 "#,
@@ -220,7 +229,8 @@ pier_test!(cli => test_run_script_pipe, cfg => r#"
 [scripts.test_pipe]
 alias = "test_pipe"
 command = '''
-    echo "TEST_RUN_SCRIPT_PIPE_OUTPUT" | tr '[:upper:]' '[:lower:]'
+#!/bin/sh
+echo "TEST_RUN_SCRIPT_PIPE_OUTPUT" | tr '[:upper:]' '[:lower:]'
 '''
 "#, | _cfg: ChildPath, mut cmd: Command | {
     cmd.args(&["run", "test_pipe"]);
@@ -234,6 +244,7 @@ pier_test!(cli => test_run_script_non_blocking, cfg => r#"
 [scripts.test_while_loop]
 alias = "test_while_loop"
 command = '''
+#!/bin/sh
 echo "1\\n2\\n3" | while read i; do echo "line read $i"; done
 '''
 "#, | _cfg: ChildPath, mut cmd: Command | {
@@ -247,7 +258,8 @@ pier_test!(cli => test_run_script_and, cfg => r#"
 [scripts.test_and]
 alias = "test_and"
 command = '''
-    echo "test-x-1" && echo "test-x-2"
+#!/bin/sh
+echo "test-x-1" && echo "test-x-2"
 '''
 "#, | _cfg: ChildPath, mut cmd: Command | {
     cmd.args(&["run", "test_and"]);
@@ -261,7 +273,8 @@ pier_test!(cli => test_stderr_output, cfg => r#"
 [scripts.write_to_stderr]
 alias = "write_to_stderr"
 command = '''
-    echo "WRITE THIS TO STDERR" >&2
+#!/bin/sh
+echo "WRITE THIS TO STDERR" >&2
 '''
 "#, | _cfg: ChildPath, mut cmd: Command | {
     cmd.args(&["run", "write_to_stderr"]);
