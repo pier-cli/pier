@@ -129,6 +129,16 @@ pier_test!(cli => test_list_scripts_with_command_width, cfg => CONFIG_1,
         .success();
 });
 
+// WORK IN PROGRESS
+pier_test!(cli => test_config_initialization, cfg => "",
+| cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["init"]);
+    cmd.assert()
+        .success();
+        cfg.assert(predicate::path::exists());
+});
+
+
 // Tests listing all aliases
 pier_test!(cli => test_list_aliases, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {

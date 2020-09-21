@@ -1,11 +1,13 @@
 use prettytable::{cell, format, row, Table};
 use snafu::{ensure, OptionExt, ResultExt};
 use std::{path::PathBuf, process::ExitStatus};
+use std::fs;
+use std::fs::File;
 pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-mod defaults;
+pub mod defaults;
 mod macros;
 use defaults::*;
 pub mod script;
@@ -20,7 +22,7 @@ pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
 #[derive(Debug, Default)]
 pub struct Pier {
     config: Config,
-    path: PathBuf,
+    pub path: PathBuf,
     verbose: bool,
 }
 
@@ -28,6 +30,31 @@ impl Pier {
     /// Wrapper to write the configuration to path.
     pub fn write(&self) -> Result<()> {
         self.config.write(&self.path)?;
+
+        Ok(())
+    }
+
+    pub fn config_init(&mut self) -> Result<()> {
+
+        if let Some(parent_dir) = &self.path.parent() {
+            if ! parent_dir.exists() {
+                fs::create_dir(parent_dir).context(CreateDirectory)?;
+            }
+        };
+
+        File::create(&self.path).context(ConfigWrite{
+            path: &self.path
+        })?;
+
+        &self.add_script(Script {
+            alias: String::from("hello-pier"),
+            command: String::from("echo Hello, Pier!"),
+            description: Some(String::from("This is an example command.")),
+            reference: None,
+            tags: None,
+        });
+
+        self.write()?;
 
         Ok(())
     }
