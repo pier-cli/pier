@@ -1,8 +1,7 @@
 use prettytable::{cell, format, row, Table};
 use snafu::{ensure, OptionExt, ResultExt};
-use std::{path::PathBuf, process::ExitStatus};
 use std::fs;
-use std::fs::File;
+use std::{path::PathBuf, process::ExitStatus};
 pub mod cli;
 mod config;
 pub mod error;
@@ -34,29 +33,29 @@ impl Pier {
         Ok(())
     }
 
-    pub fn config_init(&mut self) -> Result<()> {
+    pub fn config_init(&mut self, new_path: Option<PathBuf>) -> Result<()> {
+        self.path = new_path
+            .unwrap_or(fallback_path().unwrap_or(xdg_config_home!("pier/config.toml").unwrap()));
 
-        if let Some(parent_dir) = &self.path.parent() {
-            if ! parent_dir.exists() {
-                fs::create_dir(parent_dir).context(CreateDirectory)?;
-            }
-        };
+        ensure!(!self.path.exists(), ConfigInitFileAlreadyExists { path: &self.path.as_path() });
 
-        File::create(&self.path).context(ConfigWrite{
-            path: &self.path
-        })?;
+	if let Some(parent_dir) = &self.path.parent() {
+	    if !parent_dir.exists() {
+		fs::create_dir(parent_dir).context(CreateDirectory)?;
+	    }
+	};
 
-        &self.add_script(Script {
-            alias: String::from("hello-pier"),
-            command: String::from("echo Hello, Pier!"),
-            description: Some(String::from("This is an example command.")),
-            reference: None,
-            tags: None,
-        });
+	&self.add_script(Script {
+	    alias: String::from("hello-pier"),
+	    command: String::from("echo Hello, Pier!"),
+	    description: Some(String::from("This is an example command.")),
+	    reference: None,
+	    tags: None,
+	});
 
-        self.write()?;
+	self.write()?;
 
-        Ok(())
+	Ok(())
     }
 
     pub fn new() -> Self {
@@ -105,11 +104,11 @@ impl Pier {
 
         let mut script =
             self.config
-                .scripts
-                .get_mut(&alias.to_string())
-                .context(AliasNotFound {
-                    alias: &alias.to_string(),
-                })?;
+            .scripts
+            .get_mut(&alias.to_string())
+            .context(AliasNotFound {
+                alias: &alias.to_string(),
+            })?;
 
         script.command = open_editor(Some(&script.command))?;
 

@@ -6,7 +6,6 @@ use pier::{
     open_editor,
     script::Script,
     Pier, Result,
-    defaults::fallback_path
 };
 
 fn main() {
@@ -30,9 +29,6 @@ fn main() {
 
 /// Handles the commandline subcommands
 fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
-    //let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
-    // let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
-    //let interpreter = config.get_interpreter();
     if let Some(subcmd) = cli.cmd {
         match subcmd {
             CliSubcommand::Add {
@@ -66,14 +62,8 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 pier.write()?;
             }
             CliSubcommand::ConfigInit => {
-                // let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 let mut pier = Pier::new();
-                pier.path = match cli.opts.path {
-                    Some(path) => path,
-                    None => fallback_path()?,
-                };
-
-                pier.config_init()?;
+                pier.config_init(cli.opts.path)?;
             }
             CliSubcommand::Show { alias } => {
                 let pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
