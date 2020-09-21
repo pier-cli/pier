@@ -5,7 +5,7 @@ use snafu::ResultExt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::os::unix::fs::PermissionsExt;
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 use tempfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -27,14 +27,18 @@ impl Script {
     pub fn display_command(&self, display_full: bool, width: usize) -> &str {
         match display_full {
             true => &self.command,
-            false => match &self.command.lines().nth(0) {
-                Some(line) => match line.chars().count() {
-                    c if c < width => line,
-                    c if c > width => &line[0..width],
-                    _ => "",
-                },
-                None => &self.command,
-            },
+            false => {
+                match &self.command.lines().nth(0) {
+                    Some(line) => {
+                        match line.chars().count() {
+                            c if c < width => line,
+                            c if c > width => &line[0..width],
+                            _ => "",
+                        }
+                    }
+                    None => &self.command,
+                }
+            }
         }
     }
     /// Runs the script inline using something like sh -c "<script>" or python -c "<script."...
@@ -50,6 +54,7 @@ impl Script {
             .arg(&self.command)
             .arg(&self.alias)
             .args(&args)
+            .stderr(Stdio::piped())
             .spawn()
             .context(CommandExec)?
             .wait_with_output()
@@ -91,6 +96,7 @@ impl Script {
         }
 
         let cmd = Command::new(exec_file_path)
+            .stderr(Stdio::piped())
             .args(&args)
             .spawn()
             .context(CommandExec)?

@@ -1,11 +1,12 @@
 use prettytable::{cell, format, row, Table};
 use snafu::{ensure, OptionExt, ResultExt};
+use std::fs;
 use std::{path::PathBuf, process::ExitStatus};
 pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-mod defaults;
+pub mod defaults;
 mod macros;
 use defaults::*;
 pub mod script;
@@ -20,7 +21,7 @@ pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
 #[derive(Debug, Default)]
 pub struct Pier {
     config: Config,
-    path: PathBuf,
+    pub path: PathBuf,
     verbose: bool,
 }
 
@@ -30,6 +31,31 @@ impl Pier {
         self.config.write(&self.path)?;
 
         Ok(())
+    }
+
+    pub fn config_init(&mut self, new_path: Option<PathBuf>) -> Result<()> {
+        self.path = new_path
+            .unwrap_or(fallback_path().unwrap_or(xdg_config_home!("pier/config.toml").unwrap()));
+
+        ensure!(!self.path.exists(), ConfigInitFileAlreadyExists { path: &self.path.as_path() });
+
+	if let Some(parent_dir) = &self.path.parent() {
+	    if !parent_dir.exists() {
+		fs::create_dir(parent_dir).context(CreateDirectory)?;
+	    }
+	};
+
+	&self.add_script(Script {
+	    alias: String::from("hello-pier"),
+	    command: String::from("echo Hello, Pier!"),
+	    description: Some(String::from("This is an example command.")),
+	    reference: None,
+	    tags: None,
+	});
+
+	self.write()?;
+
+	Ok(())
     }
 
     pub fn new() -> Self {
@@ -78,11 +104,11 @@ impl Pier {
 
         let mut script =
             self.config
-                .scripts
-                .get_mut(&alias.to_string())
-                .context(AliasNotFound {
-                    alias: &alias.to_string(),
-                })?;
+            .scripts
+            .get_mut(&alias.to_string())
+            .context(AliasNotFound {
+                alias: &alias.to_string(),
+            })?;
 
         script.command = open_editor(Some(&script.command))?;
 

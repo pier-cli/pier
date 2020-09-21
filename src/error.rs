@@ -46,6 +46,11 @@ pub enum PierError {
     #[snafu(display("error: No default config file found. See help for more info."))]
     NoConfigFile,
 
+    #[snafu(display("error: Cannot initialize config at {}, file already exists.", path.display()))]
+    ConfigInitFileAlreadyExists{
+	path: PathBuf
+    },
+
     #[snafu(display(
         "error: EditorError: Failed when trying to get input from editor {}",
         source
@@ -54,4 +59,7 @@ pub enum PierError {
 
     #[snafu(display("error: Failed when trying to create executable tempfile. {}", source))]
     ExecutableTempFileCreate { source: std::io::Error },
+
+    #[snafu(display("error: Failed to create directory. {}", source))]
+    CreateDirectory { source: std::io::Error },
 }

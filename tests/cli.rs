@@ -63,9 +63,9 @@ pier_test!(cli => test_list_scripts, cfg => CONFIG_1,
 pier_test!(cli => test_run_shebang_with_args, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
     cmd.arg("run")
-	.arg("shebang-with-args")
-	.arg("Hello!")
-	.arg("Hi.");
+    .arg("shebang-with-args")
+    .arg("Hello!")
+    .arg("Hi.");
 
     cmd.assert()
         .stdout(contains("Hello!--Hi."))
@@ -75,16 +75,15 @@ pier_test!(cli => test_run_shebang_with_args, cfg => CONFIG_1,
 pier_test!(cli => test_run_inline_with_args, cfg => CONFIG_1,
 | _cfg: ChildPath, mut cmd: Command | {
     cmd.arg("run")
-	.arg("inline-with-args")
-	.env("SHELL", "/bin/sh")
-	.arg("Hello!")
-	.arg("Hi.");
+    .arg("inline-with-args")
+    .env("SHELL", "/bin/sh")
+    .arg("Hello!")
+    .arg("Hi.");
 
     cmd.assert()
         .stdout(contains("Hello!--Hi."))
         .success();
 });
-
 
 // Tests script with arguments.
 pier_test!(cli => test_list_alias_scripts, cfg => CONFIG_1,
@@ -128,6 +127,19 @@ pier_test!(cli => test_list_scripts_with_command_width, cfg => CONFIG_1,
     cmd.assert()
         .success();
 });
+
+// WORK IN PROGRESS
+pier_test!(basic => test_config_initialization,
+	   | te: crate::common::TestEnv | {
+	       let cfg = te.dir.child("pier.toml");
+
+	       let mut cmd = Command::cargo_bin("pier").expect("Failed to set cargo binary pier");
+	       cmd.current_dir(te.dir.path());
+	       cmd.args(&["-c", cfg.path().to_str().unwrap(), "init"]);
+	       cmd.assert().success();
+
+               cfg.assert(predicate::path::exists());
+	   });
 
 // Tests listing all aliases
 pier_test!(cli => test_list_aliases, cfg => CONFIG_1,

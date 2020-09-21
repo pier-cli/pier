@@ -27,22 +27,26 @@ pub enum CliSubcommand {
         /// The alias or name for the script.
         alias: String,
     },
+    /// alias: init - Add a config file.
+    #[structopt(alias = "init")]
+    ConfigInit
+    , 
     /// Edit a script matching alias.
     Edit {
-        /// The alias or name for the script.
-        alias: String,
+	/// The alias or name for the script.
+	alias: String,
     },
     /// Show a script matching alias.
     Show {
-        /// The alias or name for the script.
-        alias: String,
+	/// The alias or name for the script.
+	alias: String,
     },
     /// Run a script matching alias.
     Run {
-        /// The alias or name for the script.
-        alias: String,
+	/// The alias or name for the script.
+	alias: String,
 	/// The positional arguments to send to script.
-	args: Vec<String>
+	args: Vec<String>,
     },
     /// alias: ls - List scripts
     ///

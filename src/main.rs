@@ -29,8 +29,6 @@ fn main() {
 
 /// Handles the commandline subcommands
 fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
-    let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
-    //let interpreter = config.get_interpreter();
     if let Some(subcmd) = cli.cmd {
         match subcmd {
             CliSubcommand::Add {
@@ -39,6 +37,7 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 description,
                 tags,
             } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.add_script(Script {
                     alias,
                     description,
@@ -53,14 +52,21 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
             }
 
             CliSubcommand::Edit { alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.edit_script(&alias)?;
                 pier.write()?;
             }
             CliSubcommand::Remove { alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.remove_script(&alias)?;
                 pier.write()?;
             }
+            CliSubcommand::ConfigInit => {
+                let mut pier = Pier::new();
+                pier.config_init(cli.opts.path)?;
+            }
             CliSubcommand::Show { alias } => {
+                let pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 let script = pier.fetch_script(&alias)?;
                 println!("{}", script.command);
             }
@@ -70,6 +76,7 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 cmd_full,
                 cmd_width,
             } => {
+                let pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 if list_aliases {
                     pier.list_aliases(tags)?
                 } else {
@@ -77,12 +84,14 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 }
             }
             CliSubcommand::Run { alias, args } => {
+                let pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 let exit_code = pier.run_script(&alias, args)?;
                 return Ok(Some(exit_code));
             }
         };
     } else {
         let alias = &cli.alias.expect("Alias is required unless subcommand.");
+        let pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
         let exit_code = pier.run_script(alias, cli.args)?;
         return Ok(Some(exit_code));
     }
