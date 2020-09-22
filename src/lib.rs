@@ -175,6 +175,33 @@ impl Pier {
         Ok(())
     }
 
+/// Copy an alias a script that matches the alias
+    pub fn copy_script(
+        &mut self,
+        from_alias: &str,
+        new_alias: &str
+    ) -> Result<()> {
+        ensure!(&self.config.scripts.contains_key(&from_alias.to_string()),
+            AliasNotFound {
+                alias: from_alias
+            }
+        );
+        ensure!(!&self.config.scripts.contains_key(&new_alias.to_string()),
+            AliasAlreadyExists {
+                alias: new_alias
+            }
+        );
+
+        // TODO: refactor the line below.
+        let script = self.config.scripts.get(&from_alias.to_string()).unwrap().clone();
+
+        println!("Copy from alias {} to new alias {}", &from_alias.to_string(), &new_alias.to_string());
+
+        self.config.scripts.insert(new_alias.to_string(), script);
+
+        Ok(())
+    }
+
     /// Prints a terminal table of the scripts in current config file that matches tags.
     pub fn list_scripts(
         &self,

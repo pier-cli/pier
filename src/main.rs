@@ -88,6 +88,11 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 let exit_code = pier.run_script(&alias, args)?;
                 return Ok(Some(exit_code));
             }
+            CliSubcommand::Copy { from_alias, to_alias } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
+                pier.copy_script(&from_alias, &to_alias)?;
+                pier.write()?;
+            }
         };
     } else {
         let alias = &cli.alias.expect("Alias is required unless subcommand.");

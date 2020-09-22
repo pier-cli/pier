@@ -77,6 +77,12 @@ pub enum CliSubcommand {
         #[structopt(short = "t", long = "tag")]
         tags: Option<Vec<String>>,
     },
+    // Copy existing alias to the new one
+    #[structopt(alias = "cp")]
+    Copy {
+        from_alias: String,
+        to_alias: String,
+    }
 }
 
 #[derive(StructOpt, Debug)]
