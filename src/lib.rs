@@ -181,11 +181,6 @@ impl Pier {
         from_alias: &str,
         new_alias: &str
     ) -> Result<()> {
-        ensure!(&self.config.scripts.contains_key(&from_alias.to_string()),
-            AliasNotFound {
-                alias: from_alias
-            }
-        );
         ensure!(!&self.config.scripts.contains_key(&new_alias.to_string()),
             AliasAlreadyExists {
                 alias: new_alias
@@ -193,7 +188,13 @@ impl Pier {
         );
 
         // TODO: refactor the line below.
-        let script = self.config.scripts.get(&from_alias.to_string()).unwrap().clone();
+        let script = self
+            .config
+            .scripts
+            .get(&from_alias.to_string())
+            .context(AliasNotFound {
+                alias: &from_alias.to_string(),
+            })?.clone();
 
         println!("Copy from alias {} to new alias {}", &from_alias.to_string(), &new_alias.to_string());
 
