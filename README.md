@@ -230,6 +230,9 @@ nohup st > /dev/null 2>&1&
 
 Originally intended as a way to manage Docker one-liners, the name `pier` continues along the same maritime theme. I realized Pier can manage a lot more than just Docker scripts.
 
-## Roadmap
+## Roadmap to v1.0.0
 
-_**To be filled out again soon**_
+* Fuzzy search + autocomplete e.g. prompts for alias
+* Complete base features: mv, tag
+* Rework testing
+* Update documentation e.g. contributor guidelines, templates
