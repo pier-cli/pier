@@ -5,7 +5,7 @@ use snafu::ResultExt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::os::unix::fs::PermissionsExt;
-use std::process::{Command, Output, Stdio};
+use std::process::{Command, Output};
 use tempfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -54,7 +54,6 @@ impl Script {
             .arg(&self.command)
             .arg(&self.alias)
             .args(&args)
-            .stderr(Stdio::piped())
             .spawn()
             .context(CommandExec)?
             .wait_with_output()
@@ -96,7 +95,6 @@ impl Script {
         }
 
         let cmd = Command::new(exec_file_path)
-            .stderr(Stdio::piped())
             .args(&args)
             .spawn()
             .context(CommandExec)?
