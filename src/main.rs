@@ -38,7 +38,7 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 tags,
             } => {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
-                pier.add_script(alias, Script {
+                pier.add_script(alias.clone(), Script {
                     description,
                     command: match command {
                         Some(cmd) => cmd,
@@ -48,17 +48,23 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                     reference: None,
                 })?;
                 pier.write()?;
+
+		println!("Added {}", alias);
             }
 
             CliSubcommand::Edit { alias } => {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.edit_script(&alias)?;
                 pier.write()?;
+
+		println!("Edited {}", &alias);
             }
             CliSubcommand::Remove { alias } => {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.remove_script(&alias)?;
                 pier.write()?;
+
+		println!("Removed {}", &alias);
             }
             CliSubcommand::ConfigInit => {
                 let mut pier = Pier::new();
@@ -94,6 +100,12 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.copy_script(&from_alias, &to_alias)?;
                 pier.write()?;
+
+		println!(
+		    "Copy from alias {} to new alias {}",
+		    &from_alias.to_string(),
+		    &to_alias.to_string()
+		);
             }
             CliSubcommand::Move {
                 from_alias,
@@ -102,6 +114,12 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.move_script(&from_alias, &to_alias)?;
                 pier.write()?;
+
+		println!(
+		    "Move from alias {} to new alias {}",
+		    &from_alias.to_string(),
+		    &to_alias.to_string()
+		);
             }
         };
     } else {

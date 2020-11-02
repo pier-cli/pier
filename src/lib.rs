@@ -113,8 +113,6 @@ impl Pier {
 
         script.command = open_editor(Some(&script.command))?;
 
-        println!("Edited {}", &alias);
-
         Ok(script)
     }
 
@@ -129,7 +127,6 @@ impl Pier {
                 alias: &alias.to_string(),
             })?;
 
-        println!("Removed {}", &alias);
 
         Ok(())
     }
@@ -140,7 +137,6 @@ impl Pier {
             !&self.config.scripts.contains_key(&alias),
             AliasAlreadyExists { alias: &alias }
         );
-        println!("Added {}", &alias);
 
         self.config.scripts.insert(alias.to_string(), script);
 
@@ -199,11 +195,6 @@ impl Pier {
             })?
             .clone();
 
-        println!(
-            "Copy from alias {} to new alias {}",
-            &from_alias.to_string(),
-            &new_alias.to_string()
-        );
 
         self.config.scripts.insert(new_alias.to_string(), script);
 
