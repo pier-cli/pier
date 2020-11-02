@@ -10,7 +10,6 @@ use tempfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Script {
-    pub alias: String,
     pub command: String,
     pub description: Option<String>,
     pub reference: Option<String>,
@@ -44,6 +43,7 @@ impl Script {
     /// Runs the script inline using something like sh -c "<script>" or python -c "<script."...
     pub fn run_with_cli_interpreter(
         &self,
+        alias: &str,
         interpreter: &Vec<String>,
         args: Vec<String>,
     ) -> Result<Output> {
@@ -52,7 +52,7 @@ impl Script {
             // The following items after the binary is any commandline args that are necessary.
             .args(&interpreter[1..])
             .arg(&self.command)
-            .arg(&self.alias)
+            .arg(alias)
             .args(&args)
             .spawn()
             .context(CommandExec)?
@@ -63,14 +63,14 @@ impl Script {
     }
 
     /// First creates a temporary file and then executes the file before removing it.
-    pub fn run_with_shebang(&self, args: Vec<String>) -> Result<Output> {
+    pub fn run_with_shebang(&self, alias: &str, args: Vec<String>) -> Result<Output> {
         // Creates a temp directory to place our tempfile inside.
         let tmpdir = tempfile::Builder::new()
             .prefix("pier")
             .tempdir()
             .context(ExecutableTempFileCreate)?;
 
-        let exec_file_path = tmpdir.path().join(&self.alias);
+        let exec_file_path = tmpdir.path().join(&alias);
 
         // Creating the file inside a closure is convenient because rust will automatically handle
         // closing the file for us so we can go ahead and execute it after writing to it and setting the file permissions.

@@ -38,8 +38,7 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 tags,
             } => {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
-                pier.add_script(Script {
-                    alias,
+                pier.add_script(alias, Script {
                     description,
                     command: match command {
                         Some(cmd) => cmd,

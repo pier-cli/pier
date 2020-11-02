@@ -47,8 +47,7 @@ impl Pier {
             }
         };
 
-        &self.add_script(Script {
-            alias: String::from("hello-pier"),
+        &self.add_script(String::from("hello-pier"), Script {
             command: String::from("echo Hello, Pier!"),
             description: Some(String::from("This is an example command.")),
             reference: None,
@@ -136,16 +135,14 @@ impl Pier {
     }
 
     /// Adds a script that matches the alias
-    pub fn add_script(&mut self, script: Script) -> Result<()> {
+    pub fn add_script(&mut self, alias: String, script: Script) -> Result<()> {
         ensure!(
-            !&self.config.scripts.contains_key(&script.alias),
-            AliasAlreadyExists {
-                alias: script.alias
-            }
+            !&self.config.scripts.contains_key(&alias),
+            AliasAlreadyExists { alias: &alias }
         );
-        println!("Added {}", &script.alias);
+        println!("Added {}", &alias);
 
-        self.config.scripts.insert(script.alias.to_string(), script);
+        self.config.scripts.insert(alias.to_string(), script);
 
         Ok(())
     }
@@ -283,8 +280,8 @@ impl Pier {
         };
 
         let cmd = match script.has_shebang() {
-            true => script.run_with_shebang(args)?,
-            false => script.run_with_cli_interpreter(&interpreter, args)?,
+            true => script.run_with_shebang(&alias, args)?,
+            false => script.run_with_cli_interpreter(&alias, &interpreter, args)?,
         };
 
         let stdout = String::from_utf8_lossy(&cmd.stdout);

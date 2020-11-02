@@ -6,7 +6,6 @@ use pier::{error::*, script::Script, Pier};
 // Tests that it returns the error AliasNotFound if the alias given does not exist
 pier_test!(lib => test_error_alias_not_found, cfg => r#"
 [scripts.test_cmd_1]
-alias = 'test_cmd_1'
 command = 'echo test_1' 
 "#, | _cfg: ChildPath, mut lib: Pier | {
     err_eq!(lib.remove_script("non_existant"), AliasNotFound);
@@ -24,17 +23,15 @@ pier_test!(lib => test_error_no_scripts_exists, cfg => r#""#,
 
 pier_test!(lib => test_error_alias_already_exists, cfg => r#"
 [scripts.test_cmd_1]
-alias = 'test_cmd_1'
 command = 'echo test_1' 
 "#, | _cfg: ChildPath, mut lib: Pier | {
     let script = Script {
-    alias: "test_cmd_1".to_string(),
     command: "echo something else".to_string(),
     description: None,
     reference: None,
     tags: None
     };
-    err_eq!(lib.add_script(script), AliasAlreadyExists);
+    err_eq!(lib.add_script("test_cmd_1".to_string(),script), AliasAlreadyExists);
 });
 
 // Tests that it returns the error ConfigRead if the file cannot be read.
@@ -58,7 +55,6 @@ pier_test!(basic => test_toml_parse_error, | te: TestEnv| {
     cfg.touch().expect("Unable to create file");
     cfg.write_str(trim!(r#"
         [scripts.test_cmd_1]
-        alias = 'test_cmd_1'
         command = echo test_1 
         "#)
     ).expect("Unable to write to file");
