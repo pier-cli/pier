@@ -218,17 +218,20 @@ impl Pier {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         let mut table = Table::new();
-        table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-        table.set_titles(row!["Alias", "tags", "Command"]);
+        // table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+        table.set_format(*format::consts::FORMAT_DEFAULT);
+        table.set_titles(row!["Alias", "Tag(s)", "Description", "Command"]);
 
         for (alias, script) in &self.config.scripts {
-            match (&tags, &script.tags) {
-                (Some(list_tags), Some(script_tags)) => {
+
+            match (&tags, &script.tags, &script.description) {
+                (Some(list_tags), Some(script_tags), Some(description)) => {
                     for tag in list_tags {
                         if script_tags.contains(tag) {
                             table.add_row(row![
                                 &alias,
-                                script_tags.join(","),
+                                script_tags.join(", "),
+                                description,
                                 script.display_command(cmd_full, width)
                             ]);
 
@@ -236,17 +239,43 @@ impl Pier {
                         }
                     }
                 }
-                (None, Some(script_tags)) => {
+                (Some(list_tags), Some(script_tags), None) => {
+                    for tag in list_tags {
+                        if script_tags.contains(tag) {
+                            table.add_row(row![
+                                &alias,
+                                script_tags.join(", "),
+                                "",
+                                script.display_command(cmd_full, width)
+                            ]);
+
+                            continue;
+                        }
+                    }
+                }
+                (None, Some(script_tags), Some(description)) => {
                     table.add_row(row![
                         &alias,
-                        script_tags.join(","),
+                        script_tags.join(", "),
+                        description,
                         script.display_command(cmd_full, width)
                     ]);
 
                     continue;
                 }
-                (None, None) => {
-                    table.add_row(row![&alias, "", script.display_command(cmd_full, width)]);
+                (None, Some(script_tags), None) => {
+                    table.add_row(row![
+                        &alias,
+                        script_tags.join(", "),
+                        "",
+                        script.display_command(cmd_full, width)
+                        
+                    ]);
+
+                    continue;
+                }
+                (None, None, None) => {
+                    table.add_row(row![&alias, "", "", script.display_command(cmd_full, width)]);
 
                     continue;
                 }
