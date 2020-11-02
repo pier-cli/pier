@@ -82,6 +82,12 @@ pub enum CliSubcommand {
         from_alias: String,
         to_alias: String,
     },
+    /// Move existing alias to the new one
+    #[structopt(alias = "mv")]
+    Move {
+        from_alias: String,
+        to_alias: String,
+    },
 }
 
 #[derive(StructOpt, Debug)]

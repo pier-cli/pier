@@ -177,6 +177,14 @@ impl Pier {
         Ok(())
     }
 
+    /// Move an alias a script that matches the alias
+    pub fn move_script(&mut self, from_alias: &str, new_alias: &str) -> Result<()> {
+        self.copy_script(from_alias, new_alias)?;
+        self.remove_script(from_alias)?;
+
+        Ok(())
+    }
+
     /// Copy an alias a script that matches the alias
     pub fn copy_script(&mut self, from_alias: &str, new_alias: &str) -> Result<()> {
         ensure!(

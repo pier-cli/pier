@@ -205,6 +205,27 @@ pier_test!(cli => test_copy_script, cfg => CONFIG_1,
     );
 });
 
+// Tests move a script
+pier_test!(cli => test_move_script, cfg => CONFIG_1,
+| cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["move", "test_cmd_1", "test_cmd_4"]);
+    cmd.assert().success();
+
+    cfg.assert(contains(trim!(r#"
+            [scripts.test_cmd_4]
+            alias = 'test_cmd_1'
+            command = 'echo test_1'
+        "#)).trim()
+    );
+
+    cfg.assert(contains(trim!(r#"
+            [scripts.test_cmd_1]
+            alias = 'test_cmd_1'
+            command = 'echo test_1'
+        "#)).trim().not()
+    );
+});
+
 // Tests removing a script
 pier_test!(cli => test_remove_script, cfg => CONFIG_1,
 | cfg: ChildPath, mut cmd: Command | {
