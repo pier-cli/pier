@@ -1,0 +1,43 @@
+* Hacking
+
+** File tree
+
+#+BEGIN_EXAMPLE
+src
+├── cli.rs -- Command line arguments
+├── config.rs -- Pier config
+├── defaults.rs -- Default functions
+├── error.rs -- Custom error setup
+├── lib.rs -- Main api interface
+├── macros.rs -- Helper macros
+├── main.rs -- Pier binary endpoint
+└── script.rs -- Script struct
+tests
+├── cli.rs -- Cli integration tests
+├── common.rs -- Helper functions
+├── error_handling.rs -- Integration tests for specific custom errors
+├── macros.rs -- Helper macros
+└── tests.rs -- Main testing entrypoint
+#+END_EXAMPLE
+
+** Development setup using nix
+#+BEGIN_SRC shell
+nix-shell
+#+END_SRC
+
+** Documentation
+
+Generate api docs
+#+BEGIN_SRC shell
+cargo doc --open
+#+END_SRC
+
+** Testing 
+*** Run tests
+#+BEGIN_SRC shell
+cargo test
+#+END_SRC
+*** Run tests with stdout
+#+BEGIN_SRC shell
+cargo test -- --nocapture
+#+END_SRC

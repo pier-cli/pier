@@ -1,0 +1,140 @@
+# Quickstart
+
+** Installation
+
+
+* Usage
+
+** Help
+
+**** _Show help on commandline_
+#+BEGIN_SRC shell
+pier help
+#+END_SRC
+
+**** _Show sub command help_
+#+BEGIN_SRC shell
+pier <subcmd>--help
+#+END_SRC
+
+** Init
+_Initialize configuration_
+#+BEGIN_SRC shell
+pier init
+#+END_SRC
+
+** Run
+
+**** _Run script_
+#+BEGIN_SRC shell
+pier run hello-pier
+
+#+END_SRC
+
+**** _Run script with arguments_
+#+BEGIN_SRC shell
+pier run <alias> <arg> <arg>
+#+END_SRC
+
+
+** Add
+
+**** _Add script inline_
+#+BEGIN_SRC shell
+pier add "<command>" -a <alias>
+
+#+END_SRC
+
+**** _Add script and open command in editor_
+Running the add command with only the `-a` option will cause it to open in your `$EDITOR`
+
+#+BEGIN_SRC shell
+pier add -a <alias>
+
+#+END_SRC
+
+** Edit
+Edits script in `$EDITOR`
+
+#+BEGIN_SRC shell
+pier edit <alias>
+
+#+END_SRC
+
+** Show
+Prints command
+
+#+BEGIN_SRC shell
+pier show <alias>
+
+#+END_SRC
+
+** Copy
+#+BEGIN_SRC shell
+pier cp <from> <to>
+#+END_SRC
+
+** Move
+#+BEGIN_SRC shell
+pier mv <from> <to>
+#+END_SRC
+
+** Remove
+#+BEGIN_SRC shell
+pier rm <alias>
+#+END_SRC
+
+** List
+
+**** _List as table_
+#+BEGIN_SRC shell
+pier ls
+#+END_SRC
+
+**** _List only aliases_
+#+BEGIN_SRC shell
+pier ls -q
+#+END_SRC
+
+**** _List tags_
+TODO implement this.
+#+BEGIN_SRC shell
+pier ls -T
+#+END_SRC
+
+**** _List aliases with tag_
+#+BEGIN_SRC shell
+pier ls -t system
+#+END_SRC
+
+** Execute pier scripts in any interpreted languages
+Scripts starting with a shebang `#!` will be run with the specified interpeter just like it would in a normal script. Pier does this by creating a temp file from your script, executing it and then finally cleaning the file up. This allows you to write your pier script in python, node.js etc. even compiled languages can be run if using something like scriptisto.
+
+*** Shebang example config
+#+BEGIN_SRC toml
+[scripts.run_rust_script]
+command = '''
+#!/usr/bin/env node
+
+console.log("hello world!")
+'''
+#+END_SRC
+
+*** Setting the default shell / interpreter
+By default if no shebang is specified pier will try to use your default shell to execute the script inline. This can be overwritten with the variable interpreter. It needs to be a list with the first item being the binary and the rest is any flags necessary.
+
+**** Default interpreter example config
+_Sets the default interpreter, the first item in the list should be the binary and the rest are the arguments for the interpreter cli option._
+#+BEGIN_SRC toml
+[default]
+interpreter = ["node", "-e"]
+
+# Runs as the fallback interpreter nodejs as it's lacking a shebang
+[scripts.hello_world_nodejs]
+command = '''
+console.log("Hello world!")
+
+'''
+#+END_SRC
+
+

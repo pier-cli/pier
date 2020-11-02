@@ -1,0 +1,5 @@
+# Documentation
+
+#### *[User Documentation](./MANUAL.md)*
+
+#### *[Hacking on Pier](./HACKING.md)*
