@@ -47,9 +47,7 @@ pub enum PierError {
     NoConfigFile,
 
     #[snafu(display("error: Cannot initialize config at {}, file already exists.", path.display()))]
-    ConfigInitFileAlreadyExists{
-	path: PathBuf
-    },
+    ConfigInitFileAlreadyExists { path: PathBuf },
 
     #[snafu(display(
         "error: EditorError: Failed when trying to get input from editor {}",

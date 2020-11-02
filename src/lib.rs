@@ -37,25 +37,27 @@ impl Pier {
         self.path = new_path
             .unwrap_or(fallback_path().unwrap_or(xdg_config_home!("pier/config.toml").unwrap()));
 
-        ensure!(!self.path.exists(), ConfigInitFileAlreadyExists { path: &self.path.as_path() });
+        ensure!(!self.path.exists(), ConfigInitFileAlreadyExists {
+            path: &self.path.as_path()
+        });
 
-	if let Some(parent_dir) = &self.path.parent() {
-	    if !parent_dir.exists() {
-		fs::create_dir(parent_dir).context(CreateDirectory)?;
-	    }
-	};
+        if let Some(parent_dir) = &self.path.parent() {
+            if !parent_dir.exists() {
+                fs::create_dir(parent_dir).context(CreateDirectory)?;
+            }
+        };
 
-	&self.add_script(Script {
-	    alias: String::from("hello-pier"),
-	    command: String::from("echo Hello, Pier!"),
-	    description: Some(String::from("This is an example command.")),
-	    reference: None,
-	    tags: None,
-	});
+        &self.add_script(Script {
+            alias: String::from("hello-pier"),
+            command: String::from("echo Hello, Pier!"),
+            description: Some(String::from("This is an example command.")),
+            reference: None,
+            tags: None,
+        });
 
-	self.write()?;
+        self.write()?;
 
-	Ok(())
+        Ok(())
     }
 
     pub fn new() -> Self {
@@ -104,11 +106,11 @@ impl Pier {
 
         let mut script =
             self.config
-            .scripts
-            .get_mut(&alias.to_string())
-            .context(AliasNotFound {
-                alias: &alias.to_string(),
-            })?;
+                .scripts
+                .get_mut(&alias.to_string())
+                .context(AliasNotFound {
+                    alias: &alias.to_string(),
+                })?;
 
         script.command = open_editor(Some(&script.command))?;
 
@@ -175,16 +177,11 @@ impl Pier {
         Ok(())
     }
 
-/// Copy an alias a script that matches the alias
-    pub fn copy_script(
-        &mut self,
-        from_alias: &str,
-        new_alias: &str
-    ) -> Result<()> {
-        ensure!(!&self.config.scripts.contains_key(&new_alias.to_string()),
-            AliasAlreadyExists {
-                alias: new_alias
-            }
+    /// Copy an alias a script that matches the alias
+    pub fn copy_script(&mut self, from_alias: &str, new_alias: &str) -> Result<()> {
+        ensure!(
+            !&self.config.scripts.contains_key(&new_alias.to_string()),
+            AliasAlreadyExists { alias: new_alias }
         );
 
         // TODO: refactor the line below.
@@ -194,9 +191,14 @@ impl Pier {
             .get(&from_alias.to_string())
             .context(AliasNotFound {
                 alias: &from_alias.to_string(),
-            })?.clone();
+            })?
+            .clone();
 
-        println!("Copy from alias {} to new alias {}", &from_alias.to_string(), &new_alias.to_string());
+        println!(
+            "Copy from alias {} to new alias {}",
+            &from_alias.to_string(),
+            &new_alias.to_string()
+        );
 
         self.config.scripts.insert(new_alias.to_string(), script);
 

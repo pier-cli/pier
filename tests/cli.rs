@@ -130,16 +130,16 @@ pier_test!(cli => test_list_scripts_with_command_width, cfg => CONFIG_1,
 
 // WORK IN PROGRESS
 pier_test!(basic => test_config_initialization,
-	   | te: crate::common::TestEnv | {
-	       let cfg = te.dir.child("pier.toml");
+| te: crate::common::TestEnv | {
+    let cfg = te.dir.child("pier.toml");
 
-	       let mut cmd = Command::cargo_bin("pier").expect("Failed to set cargo binary pier");
-	       cmd.current_dir(te.dir.path());
-	       cmd.args(&["-c", cfg.path().to_str().unwrap(), "init"]);
-	       cmd.assert().success();
+    let mut cmd = Command::cargo_bin("pier").expect("Failed to set cargo binary pier");
+    cmd.current_dir(te.dir.path());
+    cmd.args(&["-c", cfg.path().to_str().unwrap(), "init"]);
+    cmd.assert().success();
 
-               cfg.assert(predicate::path::exists());
-	   });
+        cfg.assert(predicate::path::exists());
+});
 
 // Tests listing all aliases
 pier_test!(cli => test_list_aliases, cfg => CONFIG_1,
@@ -193,17 +193,17 @@ pier_test!(cli => test_add_script, cfg => CONFIG_1,
 
 // Tests copying a script
 pier_test!(cli => test_copy_script, cfg => CONFIG_1,
-    | cfg: ChildPath, mut cmd: Command | {
-        cmd.args(&["copy", "test_cmd_1", "test_cmd_4"]);
-        cmd.assert().success();
+| cfg: ChildPath, mut cmd: Command | {
+    cmd.args(&["copy", "test_cmd_1", "test_cmd_4"]);
+    cmd.assert().success();
 
-        cfg.assert(contains(trim!(r#"
+    cfg.assert(contains(trim!(r#"
             [scripts.test_cmd_4]
             alias = 'test_cmd_1'
             command = 'echo test_1'
         "#)).trim()
-        );
-    });
+    );
+});
 
 // Tests removing a script
 pier_test!(cli => test_remove_script, cfg => CONFIG_1,
