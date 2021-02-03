@@ -276,6 +276,16 @@ impl Pier {
 
                     continue;
                 }
+                (None, None, Some(description)) => {
+                    table.add_row(row![
+                        &alias,
+                        "",
+                        description,
+                        script.display_command(cmd_full, width)
+                    ]);
+
+                    continue;
+                }
                 (None, None, None) => {
                     table.add_row(row![&alias, "", "", script.display_command(cmd_full, width)]);
 
