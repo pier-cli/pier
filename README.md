@@ -2,8 +2,6 @@
 [![Build Status](https://travis-ci.com/BenSchZA/pier.svg?branch=master)](https://travis-ci.com/BenSchZA/pier)
 ![crates.io](https://img.shields.io/crates/v/pier.svg)
 
-**COMING SOON:** Syntax highlighting
-
 A central repository to manage all your one-liners, scripts, tools, and CLIs. Add, remove, list, and run scripts - storing metadata to easily find them later. No more digging through your `bin` folder...
 
 ![Boat pier](https://raw.githubusercontent.com/BenSchZA/pier/master/.media/boat-dock.png)
