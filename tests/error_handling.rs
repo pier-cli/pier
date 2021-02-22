@@ -34,7 +34,19 @@ command = 'echo test_1'
     reference: None,
     tags: None
     };
-    err_eq!(lib.add_script(script), AliasAlreadyExists);
+    err_eq!(lib.add_script(script, false), AliasAlreadyExists);
+});
+
+pier_test!(lib => test_error_alias_already_exists_on_move, cfg => r#"
+[scripts.test_cmd_1]
+alias = 'test_cmd_1'
+command = 'echo test_1'
+
+[scripts.test_cmd_2]
+alias = 'test_cmd_2'
+command = 'echo test_2'
+"#, | _cfg: ChildPath, mut lib: Pier | {
+    err_eq!(lib.move_script("test_cmd_1", "test_cmd_2",  false), AliasAlreadyExists);
 });
 
 // Tests that it returns the error ConfigRead if the file cannot be read.
