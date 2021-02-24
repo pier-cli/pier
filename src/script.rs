@@ -31,7 +31,7 @@ impl Script {
                 match &self.command.lines().nth(0) {
                     Some(line) => {
                         match line.chars().count() {
-                            c if c < width => line,
+                            c if c <= width => line,
                             c if c > width => &line[0..width],
                             _ => "",
                         }
