@@ -19,6 +19,7 @@ with nixpkgs; stdenv.mkDerivation {
   buildInputs = [ 
     rust_nightly
     rustfmt
+    python3
   ];
   shellHook = ''
         alias help="
