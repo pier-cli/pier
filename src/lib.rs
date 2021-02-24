@@ -53,7 +53,7 @@ impl Pier {
             description: Some(String::from("This is an example command.")),
             reference: None,
             tags: None,
-        });
+        }, false);
 
         self.write()?;
 
@@ -136,13 +136,16 @@ impl Pier {
     }
 
     /// Adds a script that matches the alias
-    pub fn add_script(&mut self, script: Script) -> Result<()> {
-        ensure!(
-            !&self.config.scripts.contains_key(&script.alias),
-            AliasAlreadyExists {
-                alias: script.alias
-            }
-        );
+    pub fn add_script(&mut self, script: Script, force: bool) -> Result<()> {
+        if !force {
+            ensure!(
+                !&self.config.scripts.contains_key(&script.alias),
+                AliasAlreadyExists {
+                    alias: script.alias
+                }
+            );
+        }
+
         println!("Added {}", &script.alias);
 
         self.config.scripts.insert(script.alias.to_string(), script);
@@ -196,6 +199,35 @@ impl Pier {
 
         println!(
             "Copy from alias {} to new alias {}",
+            &from_alias.to_string(),
+            &new_alias.to_string()
+        );
+
+        self.config.scripts.insert(new_alias.to_string(), script);
+
+        Ok(())
+    }
+
+    /// Move a script that matches the alias to another alias
+    pub fn move_script(&mut self, from_alias: &str, new_alias: &str, force: bool) -> Result<()> {
+        if !force {
+            ensure!(
+                !&self.config.scripts.contains_key(&new_alias.to_string()),
+                AliasAlreadyExists { alias: new_alias }
+            );
+        }
+
+        let script = self
+            .config
+            .scripts
+            .remove(&from_alias.to_string())
+            .context(AliasNotFound {
+                alias: &from_alias.to_string(),
+            })?
+            .clone();
+
+        println!(
+            "Move from alias {} to new alias {}",
             &from_alias.to_string(),
             &new_alias.to_string()
         );
@@ -271,7 +303,7 @@ impl Pier {
                         script_tags.join(", "),
                         "",
                         script.display_command(cmd_full, width)
-                        
+
                     ]);
 
                     continue;

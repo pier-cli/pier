@@ -36,6 +36,7 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                 alias,
                 description,
                 tags,
+                force,
             } => {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.add_script(Script {
@@ -47,7 +48,7 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
                     },
                     tags,
                     reference: None,
-                })?;
+                }, force)?;
                 pier.write()?;
             }
 
@@ -94,6 +95,15 @@ fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
             } => {
                 let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
                 pier.copy_script(&from_alias, &to_alias)?;
+                pier.write()?;
+            }
+            CliSubcommand::Move {
+                from_alias,
+                to_alias,
+                force,
+            } => {
+                let mut pier = Pier::from(cli.opts.path, cli.opts.verbose)?;
+                pier.move_script(&from_alias, &to_alias, force)?;
                 pier.write()?;
             }
         };

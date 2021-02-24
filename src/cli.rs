@@ -20,6 +20,10 @@ pub enum CliSubcommand {
         /// Set which tags the script belongs to.
         #[structopt(short = "t", long = "tag")]
         tags: Option<Vec<String>>,
+
+        /// Allows to overwrite the existing script
+        #[structopt(short = "f", long = "force")]
+        force: bool,
     },
     /// alias: rm - Remove a script matching alias.
     #[structopt(alias = "rm")]
@@ -76,11 +80,24 @@ pub enum CliSubcommand {
         #[structopt(short = "t", long = "tag")]
         tags: Option<Vec<String>>,
     },
-    // Copy existing alias to the new one
+    /// alias: cp - Copy existing alias to the new one
     #[structopt(alias = "cp")]
     Copy {
+        /// The alias of the script that will be copied.
         from_alias: String,
+        /// The new alias of the copy of the script.
         to_alias: String,
+    },
+    /// alias: mv, rename - Move/rename existing alias to the new one
+    #[structopt(aliases = &["mv", "rename"])]
+    Move {
+        /// The alias of the script that will be moved.
+        from_alias: String,
+        /// The new alias of the script.
+        to_alias: String,
+        /// Allows to overwrite the existing script
+        #[structopt(short = "f", long = "force")]
+        force: bool,
     },
 }
 
