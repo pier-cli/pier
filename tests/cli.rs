@@ -12,7 +12,6 @@ command = 'echo test_1'
 tags = ['info', 'echo', 'grp_1']
 
 [scripts.test_cmd_2]
-alias = 'test_cmd_2'
 command = 'echo test_2'
 tags = ['debug', 'echo']
 
@@ -184,7 +183,6 @@ pier_test!(cli => test_add_script, cfg => CONFIG_1,
 
     cfg.assert(contains(trim!(r#"
         [scripts.test_cmd_3]
-        alias = 'test_cmd_3'
         command = 'echo test_3'
         description = 'Test Description.'
     "#)).trim()
@@ -199,7 +197,6 @@ pier_test!(cli => test_add_script_force_script, cfg => CONFIG_1,
 
     cfg.assert(contains(trim!(r#"
         [scripts.test_cmd_1]
-        alias = 'test_cmd_1'
         command = 'echo test_3'
         description = 'Test Description.'
     "#)).trim()
@@ -213,8 +210,13 @@ pier_test!(cli => test_copy_script, cfg => CONFIG_1,
     cmd.assert().success();
 
     cfg.assert(contains(trim!(r#"
+            [scripts.test_cmd_1]
+            command = 'echo test_1'
+        "#)).trim()
+    );
+
+    cfg.assert(contains(trim!(r#"
             [scripts.test_cmd_4]
-            alias = 'test_cmd_1'
             command = 'echo test_1'
         "#)).trim()
     );
@@ -228,7 +230,6 @@ pier_test!(cli => test_move_script, cfg => CONFIG_1,
 
     cfg.assert(contains(trim!(r#"
             [scripts.test_cmd_4]
-            alias = 'test_cmd_1'
             command = 'echo test_1'
         "#)).trim()
     );
@@ -248,13 +249,11 @@ pier_test!(cli => test_move_with_force_script, cfg => CONFIG_1,
 
     cfg.assert(contains(trim!(r#"
             [scripts.test_cmd_2]
-            alias = 'test_cmd_1'
             command = 'echo test_1'
         "#)).trim()
     );
     cfg.assert(contains(trim!(r#"
             [scripts.test_cmd_1]
-            alias = 'test_cmd_1'
             command = 'echo test_1'
         "#)).trim().not()
     );

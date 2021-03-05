@@ -10,6 +10,7 @@ use tempfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Script {
+    #[serde(skip)]
     pub alias: String,
     pub command: String,
     pub description: Option<String>,
