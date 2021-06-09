@@ -1,4 +1,4 @@
-use super::{home, pier_err, xdg_config_home, PierError, Result};
+use super::{home, pier_err, xdg_config_home, PierError, PierResult};
 use dirs;
 use std::{env, path::PathBuf};
 pub const FALLBACK_COMMAND_DISPLAY_WIDTH: usize = 80;
@@ -11,7 +11,7 @@ pub fn fallback_shell() -> Vec<String> {
     }
 }
 
-pub fn fallback_path() -> Result<PathBuf> {
+pub fn fallback_path() -> PierResult<PathBuf> {
     let default_config_paths: Vec<Option<PathBuf>> = vec![
         Some(PathBuf::from("pier.toml")),
         xdg_config_home!("pier/config.toml"),
