@@ -358,7 +358,8 @@ impl Pier {
             };
         }
 
-        table.printstd();
+        // forced color explicitly. works in pipes
+        table.print_tty(true);
 
         Ok(())
     }
