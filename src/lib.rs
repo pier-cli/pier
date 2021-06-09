@@ -273,74 +273,84 @@ impl Pier {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         let mut table = Table::new();
-        // table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-        table.set_format(*format::consts::FORMAT_DEFAULT);
-        table.set_titles(row!["Alias", "Tag(s)", "Description", "Command"]);
 
-        for (alias, script) in self.config.scripts.iter() {
+        table.set_format(*COOL_FORMAT);
+        // cyan titles
+        table.set_titles(row![
+            Fc -> "Alias",
+            Fc -> "Tags",
+            Fc -> "Command",
+            Fc -> "Description",
+        ]);
 
-            match (&tags, &script.tags, &script.description) {
-                (Some(list_tags), Some(script_tags), Some(description)) => {
+        for (alias, script) in &self.config.scripts {
+            let shbang = script.command.starts_with("#!");
+            let descp = match &script.description.as_ref() {
+                Some(d) => d,
+                None => "",
+            };
+
+            match (&tags, &script.tags) {
+                (Some(list_tags), Some(script_tags)) => {
+
                     for tag in list_tags {
                         if script_tags.contains(tag) {
-                            table.add_row(row![
-                                &alias,
-                                script_tags.join(", "),
-                                description,
-                                script.display_command(cmd_full, width)
-                            ]);
+
+                            if shbang {
+                                table.add_row(row![
+                                    FY -> &alias,
+                                    Fg -> script_tags.join(","),
+                                    Fm -> "#! script",
+                                    Fw -> descp,
+                                ]);
+                            } else {
+                                table.add_row(row![
+                                    FY -> &alias,
+                                    Fg -> script_tags.join(","),
+                                    Fb -> script.display_command(cmd_full, width),
+                                    Fw -> descp,
+                                ]);
+                            }
 
                             continue;
                         }
                     }
                 }
-                (Some(list_tags), Some(script_tags), None) => {
-                    for tag in list_tags {
-                        if script_tags.contains(tag) {
-                            table.add_row(row![
-                                &alias,
-                                script_tags.join(", "),
-                                "",
-                                script.display_command(cmd_full, width)
-                            ]);
-
-                            continue;
-                        }
+                (None, Some(script_tags)) => {
+                    if shbang {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> script_tags.join(","),
+                            Fm -> "#! script",
+                            Fw -> descp,
+                        ]);
+                    } else {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> script_tags.join(","),
+                            Fb -> script.display_command(cmd_full, width),
+                            Fw -> descp,
+                        ]);
                     }
-                }
-                (None, Some(script_tags), Some(description)) => {
-                    table.add_row(row![
-                        &alias,
-                        script_tags.join(", "),
-                        description,
-                        script.display_command(cmd_full, width)
-                    ]);
 
                     continue;
                 }
-                (None, Some(script_tags), None) => {
-                    table.add_row(row![
-                        &alias,
-                        script_tags.join(", "),
-                        "",
-                        script.display_command(cmd_full, width)
-
-                    ]);
-
-                    continue;
-                }
-                (None, None, Some(description)) => {
-                    table.add_row(row![
-                        &alias,
-                        "",
-                        description,
-                        script.display_command(cmd_full, width)
-                    ]);
-
-                    continue;
-                }
-                (None, None, None) => {
-                    table.add_row(row![&alias, "", "", script.display_command(cmd_full, width)]);
+                (None, None) => {
+                    if shbang {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> "",
+                            Fm -> "#! script",
+                            Fw -> descp,
+                        ]);
+                    } else {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> "",
+                            Fb -> script.display_command(cmd_full, width),
+                            Fw -> descp,
+                        ]);
+                    }
 
                     continue;
                 }
