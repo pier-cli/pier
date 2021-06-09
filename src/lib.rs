@@ -6,7 +6,7 @@ pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-pub mod defaults;
+mod defaults;
 mod macros;
 use defaults::*;
 pub mod script;
@@ -21,7 +21,7 @@ pub type PierResult<T, E = PierError> = ::std::result::Result<T, E>;
 #[derive(Debug, Default)]
 pub struct Pier {
     config: Config,
-    pub path: PathBuf,
+    path: PathBuf,
     verbose: bool,
 }
 
