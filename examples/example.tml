@@ -1,11 +1,8 @@
 [scripts.list2]
-alias = "list2"
 command = "ls"
 
 [scripts.list]
-alias = "list"
 command = "ls"
 
 [scripts.touch]
-alias = "touch"
 command = "touch test"

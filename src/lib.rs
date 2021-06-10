@@ -92,7 +92,7 @@ impl Pier {
         let script = self
             .config
             .scripts
-            .get(&alias.to_string())
+            .get(alias)
             .context(AliasNotFound {
                 alias: &alias.to_string(),
             })?;
@@ -107,7 +107,7 @@ impl Pier {
         let mut script =
             self.config
                 .scripts
-                .get_mut(&alias.to_string())
+                .get_mut(alias)
                 .context(AliasNotFound {
                     alias: &alias.to_string(),
                 })?;
@@ -125,7 +125,7 @@ impl Pier {
 
         self.config
             .scripts
-            .remove(&alias.to_string())
+            .remove(alias)
             .context(AliasNotFound {
                 alias: &alias.to_string(),
             })?;
@@ -157,7 +157,7 @@ impl Pier {
     pub fn list_aliases(&self, tags: Option<Vec<String>>) -> Result<()> {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
-        for (alias, script) in &self.config.scripts {
+        for (alias, script) in self.config.scripts.iter() {
             match (&tags, &script.tags) {
                 (Some(list_tags), Some(script_tags)) => {
                     for tag in list_tags {
@@ -183,7 +183,7 @@ impl Pier {
     /// Copy an alias a script that matches the alias
     pub fn copy_script(&mut self, from_alias: &str, new_alias: &str) -> Result<()> {
         ensure!(
-            !&self.config.scripts.contains_key(&new_alias.to_string()),
+            !&self.config.scripts.contains_key(new_alias),
             AliasAlreadyExists { alias: new_alias }
         );
 
@@ -191,7 +191,7 @@ impl Pier {
         let script = self
             .config
             .scripts
-            .get(&from_alias.to_string())
+            .get(from_alias)
             .context(AliasNotFound {
                 alias: &from_alias.to_string(),
             })?
@@ -212,7 +212,7 @@ impl Pier {
     pub fn move_script(&mut self, from_alias: &str, new_alias: &str, force: bool) -> Result<()> {
         if !force {
             ensure!(
-                !&self.config.scripts.contains_key(&new_alias.to_string()),
+                !&self.config.scripts.contains_key(new_alias),
                 AliasAlreadyExists { alias: new_alias }
             );
         }
@@ -220,7 +220,7 @@ impl Pier {
         let script = self
             .config
             .scripts
-            .remove(&from_alias.to_string())
+            .remove(from_alias)
             .context(AliasNotFound {
                 alias: &from_alias.to_string(),
             })?
@@ -256,7 +256,7 @@ impl Pier {
         table.set_format(*format::consts::FORMAT_DEFAULT);
         table.set_titles(row!["Alias", "Tag(s)", "Description", "Command"]);
 
-        for (alias, script) in &self.config.scripts {
+        for (alias, script) in self.config.scripts.iter() {
 
             match (&tags, &script.tags, &script.description) {
                 (Some(list_tags), Some(script_tags), Some(description)) => {

@@ -106,20 +106,16 @@ SUBCOMMANDS:
 
 ```toml
 [scripts.refresh-wifi]
-alias = "refresh-wifi"
 command = "ip link set wlp58s0 down && sleep 5 && ip link set wlp58s0 up"
 
 [scripts.twa-analyze]
-alias = "twa-analyze"
 command = "docker run --rm -t trailofbits/twa -vw"
 tags = [ "infosec" ]
 
 [scripts.enabled-services]
-alias = "enabled-services"
 command = "systemctl list-unit-files --state=enabled"
 
 [scripts.flush-docker]
-alias = "flush-docker"
 command = "docker container stop $(docker container ls -a -q) && docker system prune -a -f --volumes"
 description = "A script to clear out old Docker containers and images"
 tags = [ "docker", "flush" ]
@@ -161,7 +157,6 @@ Scripts starting with a shebang `#!` will be run with the specified interpeter j
 
 ```
 [scripts.run_rust_script]
-alias = "run_rust_script"
 command = '''
 #!/usr/bin/env scriptisto
 
@@ -184,7 +179,6 @@ fn main() {
 '''
 
 [scripts.run_python]
-alias = "run_python"
 command = '''
 #!/usr/bin/env python3
 import sys
@@ -205,7 +199,6 @@ interpreter = ["node", "-e"]
 
 # Runs as the fallback interpreter nodejs as it's lacking a shebang
 [scripts.hello_world_nodejs]
-alias = "hello_world_nodejs"
 command = '''
 console.log("Hello world!")
 
@@ -213,7 +206,6 @@ console.log("Hello world!")
 
 # This will be run as a posix sh script as it has a shebang
 [scripts.a_shell_script]
-alias = "a_shell_script"
 command = '''
 #!/bin/sh
 
