@@ -5,7 +5,7 @@ use pier::{
     cli::{Cli, CliSubcommand},
     open_editor,
     script::Script,
-    Pier, Result,
+    Pier, PierResult,
 };
 
 fn main() {
@@ -28,7 +28,7 @@ fn main() {
 }
 
 /// Handles the commandline subcommands
-fn handle_subcommands(cli: Cli) -> Result<Option<process::ExitStatus>> {
+fn handle_subcommands(cli: Cli) -> PierResult<Option<process::ExitStatus>> {
     if let Some(subcmd) = cli.cmd {
         match subcmd {
             CliSubcommand::Add {

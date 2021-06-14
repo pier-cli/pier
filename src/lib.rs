@@ -1,4 +1,4 @@
-use prettytable::{cell, format, row, Table};
+use prettytable::{cell, row, Table};
 use snafu::{ensure, OptionExt, ResultExt};
 use std::fs;
 use std::{path::PathBuf, process::ExitStatus};
@@ -6,7 +6,7 @@ pub mod cli;
 mod config;
 pub mod error;
 use config::Config;
-pub mod defaults;
+mod defaults;
 mod macros;
 use defaults::*;
 pub mod script;
@@ -15,25 +15,46 @@ use scrawl;
 use script::Script;
 
 // Creates a Result type that return PierError by default
-pub type Result<T, E = PierError> = ::std::result::Result<T, E>;
+pub type PierResult<T, E = PierError> = ::std::result::Result<T, E>;
 
 /// Main library interface
 #[derive(Debug, Default)]
 pub struct Pier {
     config: Config,
-    pub path: PathBuf,
+    path: PathBuf,
     verbose: bool,
+}
+
+#[macro_use]
+extern crate lazy_static;
+
+use prettytable::format::LineSeparator;
+use prettytable::format::LinePosition;
+use prettytable::format::FormatBuilder;
+use prettytable::format::TableFormat;
+
+lazy_static! {
+    static ref COOL_SEP: LineSeparator = LineSeparator::new('\u{2256}', '\u{2256}', '\u{2256}', '\u{2256}');
+
+    pub static ref COOL_FORMAT: TableFormat = FormatBuilder::new()
+      .column_separator('\u{22EE}')
+      .borders('\u{22EE}')
+      .separator(LinePosition::Title, *COOL_SEP)
+      .separator(LinePosition::Bottom, *COOL_SEP)
+      .separator(LinePosition::Top, *COOL_SEP)
+      .padding(1, 1)
+      .build();
 }
 
 impl Pier {
     /// Wrapper to write the configuration to path.
-    pub fn write(&self) -> Result<()> {
+    pub fn write(&self) -> PierResult<()> {
         self.config.write(&self.path)?;
 
         Ok(())
     }
 
-    pub fn config_init(&mut self, new_path: Option<PathBuf>) -> Result<()> {
+    pub fn config_init(&mut self, new_path: Option<PathBuf>) -> PierResult<()> {
         self.path = new_path
             .unwrap_or(fallback_path().unwrap_or(xdg_config_home!("pier/config.toml").unwrap()));
 
@@ -65,7 +86,7 @@ impl Pier {
     }
 
     /// Create new pier directly from path.
-    pub fn from_file(path: PathBuf, verbose: bool) -> Result<Self> {
+    pub fn from_file(path: PathBuf, verbose: bool) -> PierResult<Self> {
         let pier = Self {
             config: Config::from(&path)?,
             verbose,
@@ -74,7 +95,7 @@ impl Pier {
         Ok(pier)
     }
     /// Create new pier from what might be a path, otherwise use the first existing default path.
-    pub fn from(input_path: Option<PathBuf>, verbose: bool) -> Result<Self> {
+    pub fn from(input_path: Option<PathBuf>, verbose: bool) -> PierResult<Self> {
         let path = match input_path {
             Some(path) => path,
             None => fallback_path()?,
@@ -86,7 +107,7 @@ impl Pier {
     }
 
     /// Fetches a script that matches the alias
-    pub fn fetch_script(&self, alias: &str) -> Result<&Script> {
+    pub fn fetch_script(&self, alias: &str) -> PierResult<&Script> {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         let script = self
@@ -101,7 +122,7 @@ impl Pier {
     }
 
     /// Edits a script that matches the alias
-    pub fn edit_script(&mut self, alias: &str) -> Result<&Script> {
+    pub fn edit_script(&mut self, alias: &str) -> PierResult<&Script> {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         let mut script =
@@ -120,7 +141,7 @@ impl Pier {
     }
 
     /// Removes a script that matches the alias
-    pub fn remove_script(&mut self, alias: &str) -> Result<()> {
+    pub fn remove_script(&mut self, alias: &str) -> PierResult<()> {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         self.config
@@ -136,7 +157,7 @@ impl Pier {
     }
 
     /// Adds a script that matches the alias
-    pub fn add_script(&mut self, script: Script, force: bool) -> Result<()> {
+    pub fn add_script(&mut self, script: Script, force: bool) -> PierResult<()> {
         if !force {
             ensure!(
                 !&self.config.scripts.contains_key(&script.alias),
@@ -154,7 +175,7 @@ impl Pier {
     }
 
     /// Prints only the aliases in current config file that matches tags.
-    pub fn list_aliases(&self, tags: Option<Vec<String>>) -> Result<()> {
+    pub fn list_aliases(&self, tags: Option<Vec<String>>) -> PierResult<()> {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         for (alias, script) in self.config.scripts.iter() {
@@ -181,7 +202,7 @@ impl Pier {
     }
 
     /// Copy an alias a script that matches the alias
-    pub fn copy_script(&mut self, from_alias: &str, new_alias: &str) -> Result<()> {
+    pub fn copy_script(&mut self, from_alias: &str, new_alias: &str) -> PierResult<()> {
         ensure!(
             !&self.config.scripts.contains_key(new_alias),
             AliasAlreadyExists { alias: new_alias }
@@ -209,7 +230,7 @@ impl Pier {
     }
 
     /// Move a script that matches the alias to another alias
-    pub fn move_script(&mut self, from_alias: &str, new_alias: &str, force: bool) -> Result<()> {
+    pub fn move_script(&mut self, from_alias: &str, new_alias: &str, force: bool) -> PierResult<()> {
         if !force {
             ensure!(
                 !&self.config.scripts.contains_key(new_alias),
@@ -243,7 +264,7 @@ impl Pier {
         tags: Option<Vec<String>>,
         cmd_full: bool,
         cmd_width: Option<usize>,
-    ) -> Result<()> {
+    ) -> PierResult<()> {
         let width = match (cmd_width, self.config.default.command_width) {
             (Some(width), _) => width,
             (None, Some(width)) => width,
@@ -252,74 +273,84 @@ impl Pier {
         ensure!(!self.config.scripts.is_empty(), NoScriptsExists);
 
         let mut table = Table::new();
-        // table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
-        table.set_format(*format::consts::FORMAT_DEFAULT);
-        table.set_titles(row!["Alias", "Tag(s)", "Description", "Command"]);
+
+        table.set_format(*COOL_FORMAT);
+        // cyan titles
+        table.set_titles(row![
+            Fc -> "Alias",
+            Fc -> "Tags",
+            Fc -> "Command",
+            Fc -> "Description",
+        ]);
 
         for (alias, script) in self.config.scripts.iter() {
+            let shbang = script.command.starts_with("#!");
+            let descp = match &script.description.as_ref() {
+                Some(d) => d,
+                None => "",
+            };
 
-            match (&tags, &script.tags, &script.description) {
-                (Some(list_tags), Some(script_tags), Some(description)) => {
+            match (&tags, &script.tags) {
+                (Some(list_tags), Some(script_tags)) => {
+
                     for tag in list_tags {
                         if script_tags.contains(tag) {
-                            table.add_row(row![
-                                &alias,
-                                script_tags.join(", "),
-                                description,
-                                script.display_command(cmd_full, width)
-                            ]);
+
+                            if shbang {
+                                table.add_row(row![
+                                    FY -> &alias,
+                                    Fg -> script_tags.join(","),
+                                    Fm -> "#! script",
+                                    Fw -> descp,
+                                ]);
+                            } else {
+                                table.add_row(row![
+                                    FY -> &alias,
+                                    Fg -> script_tags.join(","),
+                                    Fb -> script.display_command(cmd_full, width),
+                                    Fw -> descp,
+                                ]);
+                            }
 
                             continue;
                         }
                     }
                 }
-                (Some(list_tags), Some(script_tags), None) => {
-                    for tag in list_tags {
-                        if script_tags.contains(tag) {
-                            table.add_row(row![
-                                &alias,
-                                script_tags.join(", "),
-                                "",
-                                script.display_command(cmd_full, width)
-                            ]);
-
-                            continue;
-                        }
+                (None, Some(script_tags)) => {
+                    if shbang {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> script_tags.join(","),
+                            Fm -> "#! script",
+                            Fw -> descp,
+                        ]);
+                    } else {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> script_tags.join(","),
+                            Fb -> script.display_command(cmd_full, width),
+                            Fw -> descp,
+                        ]);
                     }
-                }
-                (None, Some(script_tags), Some(description)) => {
-                    table.add_row(row![
-                        &alias,
-                        script_tags.join(", "),
-                        description,
-                        script.display_command(cmd_full, width)
-                    ]);
 
                     continue;
                 }
-                (None, Some(script_tags), None) => {
-                    table.add_row(row![
-                        &alias,
-                        script_tags.join(", "),
-                        "",
-                        script.display_command(cmd_full, width)
-
-                    ]);
-
-                    continue;
-                }
-                (None, None, Some(description)) => {
-                    table.add_row(row![
-                        &alias,
-                        "",
-                        description,
-                        script.display_command(cmd_full, width)
-                    ]);
-
-                    continue;
-                }
-                (None, None, None) => {
-                    table.add_row(row![&alias, "", "", script.display_command(cmd_full, width)]);
+                (None, None) => {
+                    if shbang {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> "",
+                            Fm -> "#! script",
+                            Fw -> descp,
+                        ]);
+                    } else {
+                        table.add_row(row![
+                            FY -> &alias,
+                            Fg -> "",
+                            Fb -> script.display_command(cmd_full, width),
+                            Fw -> descp,
+                        ]);
+                    }
 
                     continue;
                 }
@@ -327,13 +358,14 @@ impl Pier {
             };
         }
 
-        table.printstd();
+        // forced color explicitly. works in pipes
+        table.print_tty(true);
 
         Ok(())
     }
 
     /// Runs a script and print stdout and stderr of the command.
-    pub fn run_script(&self, alias: &str, args: Vec<String>) -> Result<ExitStatus> {
+    pub fn run_script(&self, alias: &str, args: Vec<String>) -> PierResult<ExitStatus> {
         let script = self.fetch_script(alias)?;
         let interpreter = match self.config.default.interpreter {
             Some(ref interpreter) => interpreter.clone(),
@@ -369,7 +401,7 @@ impl Pier {
     }
 }
 
-pub fn open_editor(content: Option<&str>) -> Result<String> {
+pub fn open_editor(content: Option<&str>) -> PierResult<String> {
     let edited_text = scrawl::editor::new()
         .contents(match content {
             Some(txt) => txt,

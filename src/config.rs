@@ -7,8 +7,8 @@ use serde::de::{MapAccess, Visitor};
 use snafu::ResultExt;
 
 use super::error::*;
-use super::Result;
 use super::script::Script;
+use super::PierResult;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ConfigDefaultOpts {
@@ -35,14 +35,14 @@ pub struct Scripts(BTreeMap<String, Script>);
 
 impl Config {
     /// Helper function to read file.
-    pub fn read(path: &PathBuf) -> Result<String> {
+    pub fn read(path: &PathBuf) -> PierResult<String> {
         let file_content = fs::read_to_string(path).context(ConfigRead { path })?;
 
         Ok(file_content)
     }
 
     /// Writes the current Config to file.
-    pub fn write(&self, path: &PathBuf) -> Result<()> {
+    pub fn write(&self, path: &PathBuf) -> PierResult<()> {
         let config_string = toml::to_string_pretty(&self).context(TomlSerialize)?;
 
         fs::write(path, config_string).context(ConfigWrite { path })?;
@@ -50,7 +50,7 @@ impl Config {
         Ok(())
     }
 
-    pub fn from(path: &PathBuf) -> Result<Self> {
+    pub fn from(path: &PathBuf) -> PierResult<Self> {
         let config_str = Config::read(path)?;
 
         let config = toml::from_str(&config_str).context(TomlParse { path })?;

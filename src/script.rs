@@ -1,5 +1,5 @@
 use super::error::*;
-use super::Result;
+use super::PierResult;
 use serde::{Deserialize, Serialize};
 use snafu::ResultExt;
 use std::fs::File;
@@ -47,7 +47,7 @@ impl Script {
         &self,
         interpreter: &Vec<String>,
         args: Vec<String>,
-    ) -> Result<Output> {
+    ) -> PierResult<Output> {
         // First item in interpreter is the binary
         let cmd = Command::new(&interpreter[0])
             // The following items after the binary is any commandline args that are necessary.
@@ -65,7 +65,7 @@ impl Script {
     }
 
     /// First creates a temporary file and then executes the file before removing it.
-    pub fn run_with_shebang(&self, args: Vec<String>) -> Result<Output> {
+    pub fn run_with_shebang(&self, args: Vec<String>) -> PierResult<Output> {
         // Creates a temp directory to place our tempfile inside.
         let tmpdir = tempfile::Builder::new()
             .prefix("pier")

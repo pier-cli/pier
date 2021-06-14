@@ -43,7 +43,7 @@ pub fn setup_cli(content: &str) -> (ChildPath, TestEnv, Command) {
     (cfg, te, cmd)
 }
 
-pub fn setup_lib(content: &str) -> (ChildPath, TestEnv, pier::Result<Pier>) {
+pub fn setup_lib(content: &str) -> (ChildPath, TestEnv, pier::PierResult<Pier>) {
     let (cfg, te) = setup_dir(content);
     let path = te.dir.path().join(&cfg.path());
     let lib = Pier::from_file(path, false);
