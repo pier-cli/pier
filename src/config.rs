@@ -9,9 +9,6 @@ use snafu::ResultExt;
 use super::error::*;
 use super::script::Script;
 use super::PierResult;
-use serde::{Deserialize, Serialize};
-use snafu::ResultExt;
-use std::{collections::BTreeMap, fs, path::PathBuf};
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ConfigDefaultOpts {

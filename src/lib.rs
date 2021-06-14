@@ -283,7 +283,7 @@ impl Pier {
             Fc -> "Description",
         ]);
 
-        for (alias, script) in &self.config.scripts {
+        for (alias, script) in self.config.scripts.iter() {
             let shbang = script.command.starts_with("#!");
             let descp = match &script.description.as_ref() {
                 Some(d) => d,
