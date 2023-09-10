@@ -6,10 +6,6 @@ A central repository to manage all your one-liners, scripts, tools, and CLIs. Ad
 
 ![Boat pier](https://raw.githubusercontent.com/BenSchZA/pier/master/.media/boat-dock.png)
 
-## Looking for a new maintainer
-
-I'm stepping away from this project for a while due to burnout, if anyone is interested in taking over in my absence feel free to open an issue or send me an email. :)
-
 ## Description
 
 If you've spent any amount of time in the terminal you no doubt have built up a lovely collection of one-liners, scripts, useful tools, and CLIs. Whenever you want to use them you dig through your `bin` folder trying to remember what you called the script... Linux users love hard-to-remember naming conventions.
