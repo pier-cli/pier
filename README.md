@@ -224,3 +224,7 @@ Originally intended as a way to manage Docker one-liners, the name `pier` contin
 * Complete base features: mv, tag
 * Rework testing
 * Update documentation e.g. contributor guidelines, templates
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=pier-cli/pier&type=Date)](https://star-history.com/#pier-cli/pier&Date)
