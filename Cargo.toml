@@ -1,10 +1,7 @@
 [package]
 name = "pier"
 version = "0.2.0"
-authors = [
-    "Benjamin Scholtz",
-    "Isak Johansson"
-]
+authors = ["Benjamin Scholtz", "Isak Johansson"]
 license-file = "./LICENSE"
 description = "A Linux script management tool"
 homepage = "https://github.com/BenSchZA/pier"
@@ -20,7 +17,7 @@ autotests = false
 [dependencies]
 toml = "0.4"
 serde = { version = '1.0.83', features = ['derive'] }
-prettytable-rs = "^0.8"
+prettytable-rs = "^0.10"
 enum-kinds = "0.4.1"
 dirs = "2.0.2"
 snafu = "0.5.0"
