@@ -1,5 +1,6 @@
 # **pier** ~ A Linux script management tool
 [![Build Status](https://travis-ci.com/pier-cli/pier.svg?branch=master)](https://travis-ci.com/pier-cli/pier)
+[![Build Status](https://github.com/pier-cli/pier/actions/workflows/ci.yml/badge.svg)](https://github.com/pier-cli/pier/actions/workflows/ci.yml)
 ![crates.io](https://img.shields.io/crates/v/pier.svg)
 
 A central repository to manage all your one-liners, scripts, tools, and CLIs. Add, remove, list, and run scripts - storing metadata to easily find them later. No more digging through your `bin` folder...
